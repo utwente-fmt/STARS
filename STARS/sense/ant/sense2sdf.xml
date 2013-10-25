@@ -1,0 +1,53 @@
+<?xml version="1.0"?> 
+<!-- See sdf2uppaal for instructions on how to run -->
+<project default="main">
+	<target name="taskdefs">
+		<!-- the following is only for standalone use of this ant script -->
+		<taskdef resource="epsilontasks.xml"/>
+	</target>
+	
+	<target name="loadModels">
+ 		<property name="input" value="../Robert-SDF3-multiproc.sense.model"/>
+ 		<!-- construct uppaal file name from input file name -->
+		<script language="javascript">
+		    var input = project.getProperty("input");
+ 			var extIndex = input.lastIndexOf(".model");
+ 			if (extIndex >= 0) {
+ 				input = input.substring(0, extIndex);
+ 			}
+ 			extIndex = input.lastIndexOf(".sense");
+ 			if (extIndex >= 0) {
+ 				input = input.substring(0, extIndex);
+ 			}
+		    project.setProperty("sdf", input+".sdf3.xml");
+		</script>
+
+ 		<echo message="Sense model: ${input}"/>
+		<epsilon.emf.register file="../meta/sense.ecore"/>
+		<epsilon.emf.loadModel name="Sense"
+			modelFile="${input}"
+            metamodelUri="sense"
+            read="true"
+			store="false"/>
+
+ 		<echo message="SDF model: ${sdf}"/>
+		<epsilon.emf.loadXmlModel name="SDF"
+			modelFile="${sdf}"
+ 		    xsdFile="../meta/sdf3-sdf.xsd"
+		    read="false"
+		    store="true"/>	
+	</target>
+	
+ 	<target name="sense2sdf" depends="loadModels">
+ 		<epsilon.etl src="../epsilon/sense2sdf.etl">
+ 		    <model ref="Sense" as="In"/>
+		    <model ref="SDF" as="Out"/>
+ 		</epsilon.etl>
+ 		<echo message="Successfully created ${sdf}"/>
+ 	</target>
+
+	<target name="build" depends="sense2sdf"/>
+	
+	<target name="main" depends="taskdefs, build"/>
+</project>
+

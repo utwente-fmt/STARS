@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="ASCII"?>
+<SenseModel xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns="sense">
+  <actors name="A" inChannels="//@channels.1" outChannels="//@channels.0"/>
+  <actors name="B" inChannels="//@channels.0 //@channels.3 //@channels.4" outChannels="//@channels.1 //@channels.2 //@channels.4"/>
+  <actors name="C" inChannels="//@channels.2" outChannels="//@channels.3"/>
+  <processors name="p1" count="2" capabilities="//@capabilities.0 //@capabilities.1 //@capabilities.2"/>
+  <channels name="a2b" source="//@actors.0" target="//@actors.1" targetRate="2"/>
+  <channels name="b2a" initialTokens="2" source="//@actors.1" sourceRate="2" target="//@actors.0"/>
+  <channels name="b2c" source="//@actors.1" sourceRate="3" target="//@actors.2" targetRate="2"/>
+  <channels name="c2b" initialTokens="6" source="//@actors.2" sourceRate="2" target="//@actors.1" targetRate="3"/>
+  <channels name="b2b" initialTokens="1" source="//@actors.1" target="//@actors.1"/>
+  <capabilities time="2" processor="//@processors.0" performs="//@actors.0"/>
+  <capabilities time="2" processor="//@processors.0" performs="//@actors.1"/>
+  <capabilities time="2" processor="//@processors.0" performs="//@actors.2"/>
+</SenseModel>

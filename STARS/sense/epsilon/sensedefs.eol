@@ -1,0 +1,75 @@
+/** Auxiliary variable to set mixed content. */
+var mixedContentKey = Aux!TagType.all.first.mixed.first.eStructuralFeature;
+
+/** Concatenates all strings in a list into a single string, using a given separator. */
+operation List concat(separator: String) : String {
+	return self.concat("", separator);
+}
+
+/** Concatenates all strings in a list into a single string, using a given separator and prefix. */
+operation List concat(prefix : String, separator: String) : String {
+	var result = prefix;
+	for (s in self) {
+		if (result.length > prefix.length) {
+			result = result + separator;
+		}
+		result = result + s;
+	}
+	return result;
+}
+
+/** Returns the template name derived from a given processor. */
+operation In!ProcessorType getTemplateName() : String {
+	return "P_" + self.name;
+}
+
+/** Returns the template instance name derived from a given processor. */
+operation In!ProcessorType getProcessName(n) : String {
+	return "P_" + self.getVarName(n);
+}
+
+/** Returns a variable name for the nth instance of a template. */
+operation In!ProcessorType getVarName(n) : String {
+	return self.name + "_" + n;
+}
+
+/** Returns the buffer variable name derived from a given channel. */
+operation In!Channel getBufferName() : String {
+	return "buff_" + self.name;
+}
+
+/** Returns the counter variable name for a given actor. */
+operation In!Actor getCounterName() : String {
+	return "counter_" + self.getVarName();
+}
+
+/** Returns the name for the state where a given actor has fired but not ended. */
+operation In!Actor getStateName() : String {
+	return "InUse_" + self.getVarName();
+}
+
+/** Returns the identifying variable name for a given actor. */
+operation In!Actor getVarName() : String {
+	return self.name.toLowerCase();
+}
+
+/** Returns the fire or end action for a given actor. */
+operation In!Actor getAction(name : String, pid : String, nature : String) : String {
+	var result : String = name;
+	result = result + "[" + pid + "][" + self.getVarName() + "]";
+	result = result + nature;
+	return result;
+}
+
+/** Adds a NameType element with a given name. */
+operation Any setName(name : String) {
+	self.name = new Out!NameType;
+	self.name.addText(name);
+}
+
+/** Retrieves the content of a mixed complex type, under the
+  * assumption that this is the last item in the element.
+  */
+operation Any getText() : String {
+	return self.mixed.last().value;
+}

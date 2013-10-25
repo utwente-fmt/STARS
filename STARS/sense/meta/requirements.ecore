@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ecore:EPackage xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore" name="requirements" nsURI="http://www.fujaba.de/muml/verification/uppaal/requirements/0.4.0"
+    nsPrefix="requirements">
+  <eClassifiers xsi:type="ecore:EClass" name="Property" abstract="true"/>
+  <eClassifiers xsi:type="ecore:EClass" name="UnaryProperty" eSuperTypes="#//Property">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="expression" lowerBound="1"
+        eType="ecore:EClass http://www.fujaba.de/muml/verification/uppaal/0.4.0#//expressions/Expression"
+        containment="true"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="quantifier" lowerBound="1"
+        eType="#//PathQuantifier"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="operator" lowerBound="1"
+        eType="#//TemporalOperator"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EEnum" name="PathQuantifier">
+    <eLiterals name="EXISTS" literal="E"/>
+    <eLiterals name="FORALL" value="1" literal="A"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EEnum" name="TemporalOperator">
+    <eLiterals name="FUTURE" literal="&lt;>"/>
+    <eLiterals name="GLOBAL" value="1" literal="[]"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="BinaryProperty" abstract="true" eSuperTypes="#//Property">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="leftExpression" lowerBound="1"
+        eType="ecore:EClass http://www.fujaba.de/muml/verification/uppaal/0.4.0#//expressions/Expression"
+        containment="true"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="rightExpression" lowerBound="1"
+        eType="ecore:EClass http://www.fujaba.de/muml/verification/uppaal/0.4.0#//expressions/Expression"
+        containment="true"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="LeadsToProperty" eSuperTypes="#//BinaryProperty"/>
+  <eClassifiers xsi:type="ecore:EClass" name="DeadlockExpression" eSuperTypes="http://www.fujaba.de/muml/verification/uppaal/0.4.0#//expressions/Expression"/>
+  <eClassifiers xsi:type="ecore:EClass" name="LocationExpression" eSuperTypes="http://www.fujaba.de/muml/verification/uppaal/0.4.0#//expressions/Expression">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="process" lowerBound="1"
+        eType="#//ProcessDescriptor" containment="true"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="location" lowerBound="1"
+        eType="ecore:EClass http://www.fujaba.de/muml/verification/uppaal/0.4.0#//templates/Location"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="LocalVariableExpression" eSuperTypes="http://www.fujaba.de/muml/verification/uppaal/0.4.0#//expressions/Expression">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="process" lowerBound="1"
+        eType="#//ProcessDescriptor" containment="true"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="variableExpression" lowerBound="1"
+        eType="ecore:EClass http://www.fujaba.de/muml/verification/uppaal/0.4.0#//expressions/VariableExpression"
+        containment="true"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="ProcessDescriptor">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="template" lowerBound="1"
+        eType="ecore:EClass http://www.fujaba.de/muml/verification/uppaal/0.4.0#//templates/AbstractTemplate"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="argument" upperBound="-1"
+        eType="ecore:EClass http://www.fujaba.de/muml/verification/uppaal/0.4.0#//expressions/Expression"
+        containment="true"/>
+  </eClassifiers>
+</ecore:EPackage>

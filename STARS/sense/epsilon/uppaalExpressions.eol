@@ -1,0 +1,222 @@
+operation In!BinaryExpression operator() : String {
+	return self.operator.toString();
+}
+
+/* 18 left 	() [] .
+ * 17 right 	! ++ -- unary -
+ * 16 left 	* / %
+ * 15 left 	- +
+ * 14 left 	<< >>
+ * 13 left 	<? >?
+ * 12 left 	< <= >= >
+ * 11 left 	== !=
+ * 10 left 	&
+ *  9 left 	^
+ *  8 left 	|
+ *  7 left 	&&
+ *  6 left 	||
+ *  5 right 	?:
+ *  4 right 	= := += -= *= /= %= &= |= <<= >>= ^=
+ *  3 right 	not
+ *  2 left 	and
+ *  1 left 	or imply
+ *  0 left 	forall exists
+*/
+
+/** Prioity determined as on 
+  * http://www.uppaal.com/index.php?sida=217&rubrik=101#Expressions 
+  */
+operation In!Expression priority() : Integer {
+	var result = 0;
+	if (self.isKindOf(In!QuantificationExpression)) {
+		return result;
+	}
+	result = result + 1;
+	if (self.isKindOf(In!LogicalExpression)) {
+		switch (self.operator) {
+		case In!LogicalOperator#OR:
+		case In!LogicalOperator#IMPLY:
+			return result;
+		case In!LogicalOperator#AND:
+			return result + 1;
+		default:
+			throw "Unexpected logical operator {}".format(self.operator);
+		}
+	}
+	result = result + 2;
+	if (self.isKindOf(In!NegationExpression)) {
+		return result;
+	}
+	result = result + 1;
+	if (self.isKindOf(In!AssignmentExpression)) {
+		return result;
+	}
+	result = result + 1;
+	if (self.isKindOf(In!ConditionExpression)) {
+		return result;
+	}
+	result = result + 1;
+	// syntax || and && not distinguished from or/and
+	result = result + 2;
+	if (self.isKindOf(In!BitwiseExpression)) {
+		switch (self.operator) {
+		case In!BitwiseOperator#OR:
+			return result;
+		case In!BitwiseOperator#XOR:
+			return result + 1;
+		case In!BitwiseOperator#AND:
+			return result + 2;
+		default:
+			throw "Unexpected bitwise operator {}".format(self.operator);
+		}
+	}
+	result = result + 3;
+	if (self.isKindOf(In!CompareExpression)) {
+		switch (self.operator) {
+		case In!CompareOperator#EQUAL:
+		case In!CompareOperator#UNEQUAL:
+			return result;
+		case In!CompareOperator#GREATER_OR_EQUAL:
+		case In!CompareOperator#GREATER:
+		case In!CompareOperator#LESS_OR_EQUAL:
+		case In!CompareOperator#LESS:
+			return result + 1;
+		default:
+			throw "Unexpected comparison operator {}".format(self.operator);
+		}
+	}
+	result = result + 2;
+	if (self.isKindOf(In!MinMaxExpression)) {
+		return result;
+	}
+	result = result + 1;
+	if (self.isKindOf(In!BitShiftExpression)) {
+		return result;
+	}
+	result = result + 1;
+	if (self.isKindOf(In!ArithmeticExpression)) {
+		switch(self.operator) {
+		case In!ArithmeticOperator#ADD:
+		case In!ArithmeticOperator#SUBTRACT:
+			return result;
+		case In!ArithmeticOperator#DIVIDE:
+		case In!ArithmeticOperator#MODULO:
+		case In!ArithmeticOperator#MULTIPLICATE:
+			return result + 1;
+		default:
+			throw "Unexpected arithmetic operator {}".format(self.operator);
+		}
+	}
+	result = result + 2;
+	if (self.isKindOf(In!IncrementDecrementExpression)
+	    or self.isKindOf(In!MinusExpression)
+	    or self.isKindOf(In!PlusExpression)) {
+		return result;
+	}
+	result = result + 1;
+	return result;
+}
+
+/** Association determined as on 
+  * http://www.uppaal.com/index.php?sida=217&rubrik=101#Expressions 
+  */
+operation In!Expression assocRight() : Boolean {
+	return
+		self.isKindOf(In!NegationExpression) 
+		or self.isKindOf(In!AssignmentExpression) 
+		or self.isKindOf(In!ConditionExpression) 
+		or self.isKindOf(In!IncrementDecrementExpression)
+	    or self.isKindOf(In!MinusExpression)
+	    or self.isKindOf(In!PlusExpression);
+}
+
+/** Returns the textual representation of this expression,
+  * with surrounding parentheses if the context priority is higher
+  * than the priority of this expression.
+  */
+operation In!Expression toText(contextPrio : Integer) : String {
+	if (contextPrio > self.priority()) {
+		return "(" + self.toText() + ")";
+	} else {
+		return self.toText();
+	}
+}
+
+operation In!BinaryExpression toText() : String {
+	var result = "";
+	var leftPrio : Integer;
+	var rightPrio : Integer;
+	if (self.assocRight()) {
+		leftPrio = self.priority() + 1;
+		rightPrio = self.priority();
+	} else {
+		leftPrio = self.priority();
+		rightPrio = self.priority() + 1;
+	}
+	result = self.firstExpr.toText(leftPrio);
+	result = result + " " + self.operator() + " ";
+	result = result + self.secondExpr.toText(rightPrio);
+	return result;
+}
+
+operation In!ConditionExpression toText() : String {
+	var result = "";
+	var selfPrio = self.priority();
+	result = result + self.ifExpression.toText(selfPrio + 1) + " ? ";
+	result = result + self.thenExpression.toText(selfPrio + 1) + " : ";
+	result = result + self.elseExpression.toText(selfPrio);
+	return result;
+}
+
+operation In!FunctionCallExpression toText() : String {
+	var argList = new List;
+	for (arg in self.argument) {
+		argList.add(arg.toText());
+	}
+	return self.`function`.name + "(" + argList.concat(", ") + ")";
+}
+
+operation In!IdentifierExpression toText() : String {
+	var result = self.identifier.name;
+	for (i in self.index) {
+		result = result + "[" + i.toText() + "]";
+	}
+	return result;
+}
+
+operation In!IncrementDecrementExpression toText() : String {
+	var selfPrio = self.priority();
+	if (self.position == In!IncrementDecrementPosition#PRE) {
+		return self.operator.toString()
+			 + self.expression.toText(selfPrio);
+	} else {	
+		return self.expression.toText(selfPrio + 1)
+			 + self.operator.toString();
+	}
+}
+
+operation In!LiteralExpression toText() : String {
+	return self.text;
+}
+
+operation In!MinusExpression toText() : String {
+	return "-" + self.invertedExpression.toText(self.priority());
+}
+
+operation In!NegationExpression toText() : String {
+	return "not " + self.negatedExpression.toText(self.priority());
+}
+
+operation In!PlusExpression toText() : String {
+	return "+" + self.confirmedExpression.toText(self.priority());
+}
+
+operation In!QuantificationExpression toText() : String {
+	return self.quantifier.toString() + " " + self.expression.toText(self.priority() + 1);
+}
+
+
+operation In!ScopedIdentifierExpression toText() : String {
+	return self.scope.toText(self.priority())
+		 + "." + self.identifier.toText();
+}

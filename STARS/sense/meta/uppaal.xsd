@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
+  <xs:element name="committed" type="xs:string"/>
+
+  <xs:element name="declaration">
+    <xs:complexType mixed="true"/>
+  </xs:element>
+
+  <xs:element name="imports">
+    <xs:complexType mixed="true"/>
+  </xs:element>
+
+  <xs:element name="init">
+    <xs:complexType>
+      <xs:attribute name="ref" type="xs:IDREF" use="optional"/>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="instantiation">
+    <xs:complexType mixed="true"/>
+  </xs:element>
+
+  <xs:element name="label">
+    <xs:complexType mixed="true">
+      <xs:attribute name="x" type="xs:string" use="optional"/>
+      <xs:attribute name="kind" type="xs:string" use="required"/>
+      <xs:attribute name="y" type="xs:string" use="optional"/>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="location">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" ref="name"/>
+        <xs:element maxOccurs="unbounded" minOccurs="0" ref="label"/>
+        <xs:element minOccurs="0" ref="urgent"/>
+        <xs:element minOccurs="0" ref="committed"/>
+      </xs:sequence>
+      <xs:attribute name="x" type="xs:string" use="optional"/>
+      <xs:attribute name="color" type="xs:string" use="optional"/>
+      <xs:attribute name="y" type="xs:string" use="optional"/>
+      <xs:attribute name="id" type="xs:ID" use="required"/>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="nail">
+    <xs:complexType>
+      <xs:attribute name="x" type="xs:string" use="required"/>
+      <xs:attribute name="y" type="xs:string" use="required"/>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="name">
+    <xs:complexType mixed="true">
+      <xs:attribute name="x" type="xs:string" use="optional"/>
+      <xs:attribute name="y" type="xs:string" use="optional"/>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="nta">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" ref="imports"/>
+        <xs:element minOccurs="0" ref="declaration"/>
+        <xs:element maxOccurs="unbounded" ref="template"/>
+        <xs:element minOccurs="0" ref="instantiation"/>
+        <xs:element ref="system"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="parameter">
+    <xs:complexType mixed="true">
+      <xs:attribute name="x" type="xs:string" use="optional"/>
+      <xs:attribute name="y" type="xs:string" use="optional"/>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="source">
+    <xs:complexType>
+      <xs:attribute name="ref" type="xs:IDREF" use="required"/>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="system">
+    <xs:complexType mixed="true"/>
+  </xs:element>
+
+  <xs:element name="target">
+    <xs:complexType>
+      <xs:attribute name="ref" type="xs:IDREF" use="required"/>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="template">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="name"/>
+        <xs:element minOccurs="0" ref="parameter"/>
+        <xs:element minOccurs="0" ref="declaration"/>
+        <xs:element maxOccurs="unbounded" minOccurs="0" ref="location"/>
+        <xs:element minOccurs="0" ref="init"/>
+        <xs:element maxOccurs="unbounded" minOccurs="0" ref="transition"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="transition">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="source"/>
+        <xs:element ref="target"/>
+        <xs:element maxOccurs="unbounded" minOccurs="0" ref="label"/>
+        <xs:element maxOccurs="unbounded" minOccurs="0" ref="nail"/>
+      </xs:sequence>
+      <xs:attribute name="x" type="xs:string" use="optional"/>
+      <xs:attribute name="color" type="xs:string" use="optional"/>
+      <xs:attribute name="y" type="xs:string" use="optional"/>
+      <xs:attribute name="id" type="xs:ID" use="optional"/>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="urgent" type="xs:string"/>
+
+</xs:schema>

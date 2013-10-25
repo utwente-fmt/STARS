@@ -1,0 +1,53 @@
+// Core definitions
+operation In!CommentableElement toComment() : String {
+	if (self.comment.isDefined()) {
+		return "// " + self.comment + "\n";
+	} else {
+		return "";
+	}
+}
+
+// Template definitions
+operation In!Synchronization toText() : String {
+	return self.channelExpression.toText() + self.kind.toString();
+	
+}
+
+operation In!Selection toText() : String {
+	return self.variable.first().toText() + " : " + self.typeDefinition.toText();
+}
+
+// Types
+operation In!Type toText() : String {
+	return self.name;
+}
+
+// Type definitions
+operation In!TypeReference toText() : String {
+	return self.referredType.name;
+}
+
+operation In!RangeTypeSpecification toText() : String {
+	var result : String = "int [";
+	result = result + self.bounds.lowerBound.toText();
+	result = result + ", ";
+	result = result + self.bounds.upperBound.toText();
+	result = result + "]";
+	return result;
+}
+
+operation In!ScalarTypeSpecification toText() : String {
+	var result : String = "scalar [";
+	result = result + self.sizeExpression.toText();
+	result = result + "]";
+	return result;
+}
+
+operation In!StructTypeSpecification toText() : String {
+	var result : String = "struct {\n";
+	for (decl in self.declaration) {
+		result = result + "  " + decl.toText() + ";\n";
+	}
+	result = result + "}";
+	return result;
+}

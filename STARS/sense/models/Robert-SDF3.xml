@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<sdf3 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://www.es.ele.tue.nl/sdf3/xsd/sdf3-sdf.xsd"
+    type="sdf" version="1.0">
+  <applicationGraph name="example-app">
+    <sdf name="example" type="Example">
+      <actor name="A" type="A">
+        <port name="outb" rate="1" type="out"/>
+        <port name="inb" rate="1" type="in"/>
+      </actor>
+      <actor name="B" type="B">
+        <port name="inc" rate="3" type="in"/>
+        <port name="outc" rate="3" type="out"/>
+        <port name="ina" rate="2" type="in"/>
+        <port name="outa" rate="2" type="out"/>
+        <port name="outb" rate="1" type="out"/>
+        <port name="inb" rate="1" type="in"/>
+      </actor>
+      <actor name="C" type="C">
+        <port name="inb" rate="2" type="in"/>
+        <port name="outb" rate="2" type="out"/>
+      </actor>
+      <channel dstActor="B" dstPort="ina" initialTokens="0" name="a2b" srcActor="A"
+          srcPort="outb"/>
+      <channel dstActor="A" dstPort="inb" initialTokens="2" name="b2a" srcActor="B"
+          srcPort="outa"/>
+      <channel dstActor="C" dstPort="inb" initialTokens="0" name="b2c" srcActor="B"
+          srcPort="outc"/>
+      <channel dstActor="B" dstPort="inc" initialTokens="6" name="c2b" srcActor="C"
+          srcPort="outb"/>
+      <channel dstActor="B" dstPort="inb" initialTokens="1" name="b2b" srcActor="B"
+          srcPort="outb"/>
+    </sdf>
+    <sdfProperties>
+      <actorProperties actor="A">
+        <processor default="true" type="p1">
+          <executionTime time="2"/>
+        </processor>
+      </actorProperties>
+      <actorProperties actor="B">
+        <processor default="true" type="p1">
+          <executionTime time="2"/>
+        </processor>
+      </actorProperties>
+      <actorProperties actor="C">
+        <processor default="true" type="p1">
+          <executionTime time="3"/>
+        </processor>
+      </actorProperties>
+    </sdfProperties>
+  </applicationGraph>
+</sdf3>

@@ -1,0 +1,75 @@
+<?xml version="1.0"?> 
+<!--
+	From Eclipse: run in either of the following fashions
+	- Through "sdf2uppaal (eclipse ant).launch", to run in the Eclipse JRE
+	- Through "sdf2uppaal (standalone).launch", to run in a standalone JRE
+	
+	From the command line, e.g. invoked from the sense directory:
+	- Invoke 'ant -lib lib -f ant/sdf2uppaal.xml -Dinput=path/to/sdf3.xml'
+	- Modify the lib path depending on base directory and OS; e.g.
+	  * from one level higher it should be -lib sense\lib
+	  * under Linux it should then be -lib sense/lib
+	- If /path/to/sdf3 is relative, it is computed from the directory
+	  containing the ant build file (not the base directory!)
+-->
+
+<project default="main">
+	<target name="taskdefs">
+		<!-- the following is only for standalone use of this ant script -->
+		<taskdef resource="epsilontasks.xml"/>
+	</target>
+
+	<target name="loadModels">
+ 		<property name="input" value="../models/Robert-SDF3.xml"/>
+ 		<!-- construct sense and uppaal file name from input file name -->
+		<script language="javascript">
+		    var input = project.getProperty("input");
+		    var stripped = input.substring(0, input.lastIndexOf("."));
+		    project.setProperty("sense", stripped+".sense");
+		    project.setProperty("uppaal", stripped+".uppaal.xml");
+		</script>
+
+ 		<echo message="Input model: ${input}"/>
+ 		<epsilon.emf.loadXmlModel name="SDF"
+            modelFile="${input}"
+            xsdFile="../meta/sdf3-sdf.xsd"
+            read="true"
+            store="false"/>
+
+ 		<echo message="Sense model: ${sense}"/>
+ 		<epsilon.emf.register file="../meta/sense.ecore"/>
+		<epsilon.emf.loadModel name="Sense"
+			modelFile="${sense}"
+            metamodelUri="sense"
+            read="false"
+			store="true"/>
+
+ 		<echo message="Uppaal model: ${uppaal}"/>
+		<epsilon.emf.loadXmlModel name="Uppaal"
+			modelFile="${uppaal}"
+ 		    xsdFile="../meta/uppaal.xsd"
+ 		    read="false"
+ 		    store="true"/>
+	</target>
+
+ 	<target name="sdf2sense" depends="loadModels">
+ 		<epsilon.etl src="../epsilon/sdf2sense.etl">
+ 		    <model ref="SDF" as="In"/>
+		    <model ref="Sense" as="Out"/>
+ 		</epsilon.etl>
+ 		<echo message="Successfully created ${sense}"/>
+ 	</target>
+ 		 	
+ 	<target name="sense2uppaal" depends="loadModels">
+ 		<epsilon.etl src="../epsilon/sense2uppaal.etl">
+ 		    <model ref="Sense" as="In"/>
+		    <model ref="Uppaal" as="Out"/>
+ 		</epsilon.etl>
+ 		<echo message="Successfully created ${uppaal}"/>
+ 	</target>
+
+	<target name="build" depends="sdf2sense, sense2uppaal"/>
+	
+	<target name="main" depends="taskdefs, build"/>
+</project>
+

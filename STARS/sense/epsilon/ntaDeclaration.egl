@@ -1,0 +1,54 @@
+[%
+// Alternative way to generate the Uppaal declarations section
+// Currently unused; to use, add to workflow sdf2uppaal.xml
+
+// Import auxiliary definitions
+import "sensedefs.eol";
+/** Process ids array. */
+var IDS : String = "id_r";
+%]
+
+// Global Clock
+clock global;
+
+// # of Processors
+const int N = [%= getProcessorCount() %];
+// # of Actors
+const int M = [%= In!Actor.all.size() %];	
+
+// Task and Processors IDs
+typedef int[0,N-1] [%=IDS %];
+
+// Channels
+chan end[N][M], fire[N][M];
+
+// Buffer and Edge Sizes
+[% for (c in In!Channel) { %]
+int [%= c.getBufferName() %] = [%= c.initialTokens %];
+[% } %]
+
+// Flag to check if SDFG has started\n"
+bool [%= SDF_ACT %]=true;
+
+// Counter for each actor
+[% for (a in In!Actor) { %]
+int [%= a.getCounterName() %] = 0;
+[% } %]
+
+void produce(int &channel_tokens, int tokens) {
+    channel_tokens+=tokens;
+}
+
+void consume(int &channel_tokens, int tokens) {
+    channel_tokens-=tokens;
+}	
+
+[%
+operation getProcessorCount() : Integer {
+	var result = 0;
+	for (pt in In!ProcessorType) {
+		result = result + pt.count;
+	}
+	return result;
+}
+%]

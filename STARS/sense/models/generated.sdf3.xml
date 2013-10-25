@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<sdf3 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://www.es.ele.tue.nl/sdf3/xsd/sdf3-sdf.xsd"
+    type="sdf" version="1.0">
+  <applicationGraph name="example-app">
+    <sdf name="example" type="Example">
+      <actor name="A" type="A">
+        <port name="a2b_out" rate="1" type="out"/>
+        <port name="b2a_in" rate="1" type="in"/>
+      </actor>
+      <actor name="B" type="B">
+        <port name="a2b_in" rate="2" type="in"/>
+        <port name="b2a_out" rate="2" type="out"/>
+        <port name="b2c_out" rate="3" type="out"/>
+        <port name="c2b_in" rate="3" type="in"/>
+        <port name="b2b_out" rate="1" type="out"/>
+        <port name="b2b_in" rate="1" type="in"/>
+      </actor>
+      <actor name="C" type="C">
+        <port name="b2c_in" rate="2" type="in"/>
+        <port name="c2b_out" rate="2" type="out"/>
+      </actor>
+      <channel dstActor="B" dstPort="a2b_in" initialTokens="0" name="a2b" srcActor="A"
+          srcPort="a2b_out"/>
+      <channel dstActor="A" dstPort="b2a_in" initialTokens="2" name="b2a" srcActor="B"
+          srcPort="b2a_out"/>
+      <channel dstActor="C" dstPort="b2c_in" initialTokens="0" name="b2c" srcActor="B"
+          srcPort="b2c_out"/>
+      <channel dstActor="B" dstPort="c2b_in" initialTokens="6" name="c2b" srcActor="C"
+          srcPort="c2b_out"/>
+      <channel dstActor="B" dstPort="b2b_in" initialTokens="1" name="b2b" srcActor="B"
+          srcPort="b2b_out"/>
+    </sdf>
+    <sdfProperties>
+      <actorProperties actor="A">
+        <processor default="true" type="p1">
+          <executionTime time="2"/>
+        </processor>
+      </actorProperties>
+      <actorProperties actor="B">
+        <processor default="true" type="p1">
+          <executionTime time="2"/>
+        </processor>
+      </actorProperties>
+      <actorProperties actor="C">
+        <processor default="true" type="p2">
+          <executionTime time="3"/>
+        </processor>
+      </actorProperties>
+    </sdfProperties>
+  </applicationGraph>
+</sdf3>

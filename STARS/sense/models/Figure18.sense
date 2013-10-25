@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="ASCII"?>
+<SenseModel xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns="sense">
+  <actors name="A" inChannels="//@channels.1 //@channels.3 //@channels.12" outChannels="//@channels.0 //@channels.2 //@channels.13"/>
+  <actors name="B" inChannels="//@channels.0 //@channels.5 //@channels.9 //@channels.15" outChannels="//@channels.1 //@channels.4 //@channels.8 //@channels.15"/>
+  <actors name="C" inChannels="//@channels.4 //@channels.7" outChannels="//@channels.5 //@channels.6"/>
+  <actors name="D" inChannels="//@channels.6 //@channels.10 //@channels.16" outChannels="//@channels.7 //@channels.11 //@channels.16"/>
+  <actors name="E" inChannels="//@channels.8 //@channels.11 //@channels.13" outChannels="//@channels.9 //@channels.10 //@channels.12"/>
+  <actors name="F" inChannels="//@channels.2 //@channels.14" outChannels="//@channels.3 //@channels.14"/>
+  <processors name="p1" count="2" capabilities="//@capabilities.0 //@capabilities.1 //@capabilities.2 //@capabilities.3 //@capabilities.4 //@capabilities.5"/>
+  <channels name="a2b" source="//@actors.0" sourceRate="3" target="//@actors.1" targetRate="5"/>
+  <channels name="b2a" initialTokens="9" source="//@actors.1" sourceRate="5" target="//@actors.0" targetRate="3"/>
+  <channels name="a2f" source="//@actors.0" sourceRate="2" target="//@actors.5"/>
+  <channels name="f2a" initialTokens="4" source="//@actors.5" target="//@actors.0" targetRate="2"/>
+  <channels name="b2c" source="//@actors.1" sourceRate="2" target="//@actors.2" targetRate="3"/>
+  <channels name="c2b" initialTokens="6" source="//@actors.2" sourceRate="3" target="//@actors.1" targetRate="2"/>
+  <channels name="c2d" source="//@actors.2" sourceRate="3" target="//@actors.3"/>
+  <channels name="d2c" initialTokens="5" source="//@actors.3" target="//@actors.2" targetRate="3"/>
+  <channels name="b2e" source="//@actors.1" sourceRate="4" target="//@actors.4"/>
+  <channels name="e2b" initialTokens="8" source="//@actors.4" target="//@actors.1" targetRate="4"/>
+  <channels name="e2d" source="//@actors.4" target="//@actors.3" targetRate="2"/>
+  <channels name="d2e" initialTokens="4" source="//@actors.3" sourceRate="2" target="//@actors.4"/>
+  <channels name="e2a" initialTokens="35" source="//@actors.4" sourceRate="5" target="//@actors.0" targetRate="12"/>
+  <channels name="a2e" initialTokens="16" source="//@actors.0" sourceRate="12" target="//@actors.4" targetRate="5"/>
+  <channels name="f2f" initialTokens="1" source="//@actors.5" target="//@actors.5"/>
+  <channels name="b2b" initialTokens="1" source="//@actors.1" target="//@actors.1"/>
+  <channels name="d2d" initialTokens="1" source="//@actors.3" target="//@actors.3"/>
+  <capabilities time="2" processor="//@processors.0" performs="//@actors.0"/>
+  <capabilities time="2" processor="//@processors.0" performs="//@actors.1"/>
+  <capabilities time="2" processor="//@processors.0" performs="//@actors.2"/>
+  <capabilities time="2" processor="//@processors.0" performs="//@actors.3"/>
+  <capabilities time="2" processor="//@processors.0" performs="//@actors.4"/>
+  <capabilities time="2" processor="//@processors.0" performs="//@actors.5"/>
+</SenseModel>

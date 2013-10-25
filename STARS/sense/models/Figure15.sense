@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="ASCII"?>
+<SenseModel xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns="sense">
+  <actors name="A" inChannels="//@channels.4 //@channels.6" outChannels="//@channels.0 //@channels.1"/>
+  <actors name="B" inChannels="//@channels.5 //@channels.7" outChannels="//@channels.2 //@channels.3"/>
+  <actors name="C" inChannels="//@channels.0 //@channels.2" outChannels="//@channels.4 //@channels.5"/>
+  <actors name="D" inChannels="//@channels.1 //@channels.3" outChannels="//@channels.6 //@channels.7"/>
+  <processors name="p1" count="2" capabilities="//@capabilities.0 //@capabilities.1 //@capabilities.2 //@capabilities.3"/>
+  <channels name="a2c" source="//@actors.0" sourceRate="3" target="//@actors.2" targetRate="4"/>
+  <channels name="a2d" source="//@actors.0" sourceRate="4" target="//@actors.3" targetRate="3"/>
+  <channels name="b2c" source="//@actors.1" target="//@actors.2" targetRate="4"/>
+  <channels name="b2d" source="//@actors.1" sourceRate="4" target="//@actors.3" targetRate="9"/>
+  <channels name="c2a" initialTokens="6" source="//@actors.2" sourceRate="4" target="//@actors.0" targetRate="3"/>
+  <channels name="c2b" initialTokens="4" source="//@actors.2" sourceRate="4" target="//@actors.1"/>
+  <channels name="d2a" initialTokens="6" source="//@actors.3" sourceRate="3" target="//@actors.0" targetRate="4"/>
+  <channels name="d2b" initialTokens="12" source="//@actors.3" sourceRate="9" target="//@actors.1" targetRate="4"/>
+  <capabilities processor="//@processors.0" performs="//@actors.0"/>
+  <capabilities processor="//@processors.0" performs="//@actors.1"/>
+  <capabilities processor="//@processors.0" performs="//@actors.2"/>
+  <capabilities processor="//@processors.0" performs="//@actors.3"/>
+</SenseModel>

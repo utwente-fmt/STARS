@@ -1,0 +1,52 @@
+/** Concatenates all strings in a list into a single string, using a given separator. */
+operation List concat(separator: String) : String {
+	return self.concat("", separator);
+}
+
+/** Concatenates all strings in a list into a single string, using a given separator and prefix. */
+operation List concat(prefix : String, separator: String) : String {
+	var result = prefix;
+	for (s in self) {
+		if (result.length > prefix.length) {
+			result = result + separator;
+		}
+		result = result + s;
+	}
+	return result;
+}
+
+/** Converts the list of lines representing a given element
+  * to a single string, by concatenating and adding newlines.
+  */ 
+operation Any toText() {
+	var result = "";
+	for (line in self.toLines()) {
+		result = result + line + "\n";
+	}
+	return result;
+}
+
+/** Adds spaces in front of the lines in a list, to a given depth. */
+operation Any toLines(indent : Integer) : List {
+	var result = new List;
+	var prefix = "";
+	while (indent > 0) {
+		prefix = prefix + "    ";
+		indent = indent - 1;
+	}
+	for (line in self.toLines()) {
+		result.add(prefix + line);
+	}
+	return result;
+}
+
+/** Prepends a string to the first element in a list. */
+operation List append(suffix) {
+	var last = self.removeAt(self.size() - 1);
+	self.add(last + suffix);
+}
+
+/** Appends a string to the last element in a list. */
+operation List prepend(prefix) : List {
+	self.set(0, prefix + self.first());
+}

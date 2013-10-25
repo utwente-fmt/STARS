@@ -1,0 +1,195 @@
+/** Returns the text for a declaration block. */
+operation In!Declarations toLines() : List {
+	var result = new List;
+	for (decl in self.declaration) {
+		var declText = decl.toText();
+		if (decl.isKindOf(In!VariableDeclaration)) {
+			declText = declText + ";";
+		}
+		result.add(declText);
+		result.add("");
+	}
+	result.addAll(self.toSpecialLines());
+	return result;
+}
+
+/** Returns the extra lines for a global declaration block */
+operation In!GlobalDeclarations toSpecialLines() : List {
+	// Returns the textual channel priority specification.
+	var result = new List;
+	if (self.channelPriority.size() > 1) {
+		for (item in self.channelPriority) {
+			if (result.isEmpty()) {
+				result.add("chan priority " + item.toText());
+			} else {
+				result.add("    > " + item.toText());
+			}
+		}
+		result.append(";");
+	}
+	return result;
+}
+
+/** Returns the extra lines for a system declaration block */
+operation In!SystemDeclarations toSpecialLines() : List {
+	var result = new List;
+	// add the optional progress measure
+	if (self.progressMeasure.isDefined()) {
+		result.add(self.progressMeasure.toText());
+	}
+	// add the system specification
+	var firstInst = true;
+	for (instList in self.system.instantiationList) {
+		var procList = new List;
+		for (templ in instList.template) {
+			procList.add(templ.name);
+		}
+		if (firstInst) {
+			result.add("system " + procList.concat(", "));
+			firstInst = false;
+		} else {
+			result.add("    > " + procList.concat(", "));
+		}
+	}
+	result.append(";");
+	return result;
+}
+
+/** Returns the extra lines for a local declaration block */
+operation In!LocalDeclarations toSpecialLines() : List {
+	return Sequence {};
+}
+
+operation In!DefaultChannelPriority toText() : String {
+	return "default";
+}
+
+operation In!ChannelList toText() : String {
+	var chList = new List;
+	for (ch in self.channelExpression) {
+		chList.add(ch.toText());
+	}
+	return chList.concat(", ");
+}
+
+operation In!Parameter toText() : String {
+	var result = "";
+	var decl = self.variableDeclaration;
+	result = decl.typeDefinition.toText();
+	if (self.callType == In!CallType#CALL_BY_REFERENCE) {
+		result = result + "&";
+	}
+	// parameters are guaranteed to consist of a single variable
+	result = result + " " + decl.variable.first().toText();
+	return result;
+}
+
+// Variable declarations 
+operation In!DataVariableDeclaration getPrefix() : String {
+	var result : String = "";
+	if (self.prefix <> In!DataVariablePrefix#NONE) {
+		result = self.prefix.toString() + " ";
+	}
+	return result;
+}
+
+operation In!ChannelVariableDeclaration getPrefix() : String {
+	var result : String = "";
+	if (self.urgent) {
+		result = result + "urgent ";
+	}
+	if (self.broadcast) {
+		result = result + "broadcast ";
+	}
+	return result;
+}
+
+/** Default prefix for variable containers. */
+operation In!VariableContainer getPrefix() : String {
+	return "";
+}
+
+/** Returns a flattened text version of a variable declaration. */
+operation In!VariableContainer toText() : String {
+	var result : String = self.getPrefix() + self.typeDefinition.toText();
+	var vars : List = new List;
+	for (v : In!Variable in self.variable) {
+		vars.add(v.toText());
+	}
+	result = result + " " + vars.concat(", ");
+	return result;
+}
+
+operation In!Variable toText() : String {
+	var result = self.name;
+	for (i in self.index) {
+		result = result + "[" + i.toText() + "]";
+	}
+	if (self.initializer.isDefined()) {
+		result = result + " = " + self.initializer.toText();
+	}
+	return result;
+}
+
+operation In!ValueIndex toText() : String {
+	return self.sizeExpression.toText();
+}
+
+operation In!TypeIndex toText() : String {
+	return self.typeDefinition.toText();
+}
+
+operation In!ArrayInitializer toText() : String {
+	var subInit = new List;
+	for (i in self.initializer) {
+		subInit.add(i.toText());
+	}
+	return "{ " + subInit.concat(", ") + " }";
+}
+
+operation In!ExpressionInitializer toText() : String {
+	return self.expression.toText();
+}
+
+operation In!FunctionDeclaration toText() : String {
+	var func = self.`function`;
+	var result = func.returnType.toText() + " " + func.name;
+	var parList = new List;
+	for (par in func.parameter) {
+		parList.add(par.toText());
+	}
+	result = result + "(" + parList.concat(", ") + ") ";
+	return result + func.block.toText();
+}
+
+operation In!TypeDeclaration toText() : String {
+	var result = "typedef " + self.typeDefinition.toText() + " ";
+	var typeList = new List;
+	for (type in self.type) {
+		typeList.add(type.toText());
+	}
+	return result + typeList.concat(", ") + ";";
+}
+
+operation In!TemplateDeclaration toText() : String {
+	var result = self.declaredTemplate.toComment();
+	var declaredName = self.declaredTemplate.name;
+	var parameters = self.declaredTemplate.parameter;
+	var invokedName = self.declaredTemplate.referredTemplate.name;
+	var arguments = self.argument;
+	result = result + declaredName;
+	if (not parameters.isEmpty()) {
+		var parList = new List;
+		for (par in parameters) {
+			parList.add(par.toText());
+		}
+		result = result + "(" + parList.concat(", ") + ")";
+	}
+	result = result + " = " + invokedName;
+	var argList = new List;
+	for (arg in arguments) {
+		argList.add(arg.toText());
+	}
+	result = result + "(" + argList.concat(", ") + ");";
+	return result;
+}

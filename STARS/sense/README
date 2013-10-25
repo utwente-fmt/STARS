@@ -1,0 +1,25 @@
+To use one of the transformations
+=================================
+- Right-click the relevant ant launch file (in the ant subdirectory)
+- Select "Run As..." and invoke
+- Select the input model to transform
+- Output model(s) will be created in the same directory as the input model
+
+
+To start up the diagram editor
+==============================
+- Make sure you have all dependant plugin projects installed (sense.diagrm, sense.edit, sense.editor)
+- Right-click "plugin.xml", select "Run As..." and invoke as Eclipse Application
+- This will start a new Eclipse instance, which has to run in a separate workspace
+- Create an empty project (New | Project | General | Project...)
+- Within the new project, start up the editor (New | Example... | Sense Diagram)
+- Saving the diagram will create a .sense-file that you can transform to SDF3 or Uppaal
+
+See http://www.eclipse.org/epsilon/doc/articles/eugenia-gmf-tutorial/ for further info
+
+
+Alternatively, to edit an existing .sense-file
+==============================================
+- Copy a .sense-file to the project folder (outside Eclipse)
+- Refresh the Eclipse project
+- Right-click the .sense-file and select "initialize sense_diagram diagram file"

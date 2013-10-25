@@ -1,0 +1,196 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<nta>
+  <declaration>// Global Clock
+clock global;
+
+// # of Processors
+const int N = 4;
+// # of Actors   
+const int M = 3;
+
+// Task and Processors IDs
+typedef int[0,N-1] id_r;
+
+// Channels
+chan end[N][M], fire[N][M];
+
+// Buffer and Edge Sizes
+int buff_a2b=0;
+int buff_b2a=2;
+int buff_b2c=0;
+int buff_c2b=6;
+int buff_b2b=1;
+
+// Flag to check if SDFG has started
+bool flag_act=true;
+
+// Counter for each actor
+int counter_a = 0;
+int counter_b = 0;
+int counter_c = 0;
+
+void produce(int &amp;channel_tokens, int tokens) {
+    channel_tokens+=tokens;
+}
+
+void consume(int &amp;channel_tokens, int tokens) {
+    channel_tokens-=tokens;
+}
+</declaration>
+  <template>
+    <name>P_p1</name>
+    <parameter>const int p_id, const int a, const int b</parameter>
+    <declaration>clock x;</declaration>
+    <location id="Idle">
+      <name>Idle</name>
+    </location>
+    <location id="A">
+      <name>InUse_a</name>
+      <label kind="invariant">x &lt;= 2</label>
+    </location>
+    <location id="B">
+      <name>InUse_b</name>
+      <label kind="invariant">x &lt;= 2</label>
+    </location>
+    <init ref="Idle"/>
+    <transition>
+      <source ref="Idle"/>
+      <target ref="A"/>
+      <label kind="synchronization">fire[p_id][a]!</label>
+      <label kind="assignment">x := 0</label>
+    </transition>
+    <transition>
+      <source ref="A"/>
+      <target ref="Idle"/>
+      <label kind="synchronization">end[p_id][a]?</label>
+      <label kind="guard">x == 2</label>
+    </transition>
+    <transition>
+      <source ref="Idle"/>
+      <target ref="B"/>
+      <label kind="synchronization">fire[p_id][b]!</label>
+      <label kind="assignment">x := 0</label>
+    </transition>
+    <transition>
+      <source ref="B"/>
+      <target ref="Idle"/>
+      <label kind="synchronization">end[p_id][b]?</label>
+      <label kind="guard">x == 2</label>
+    </transition>
+  </template>
+  <template>
+    <name>P_p2</name>
+    <parameter>const int p_id, const int c</parameter>
+    <declaration>clock x;</declaration>
+    <location id="Idle">
+      <name>Idle</name>
+    </location>
+    <location id="C">
+      <name>InUse_c</name>
+      <label kind="invariant">x &lt;= 3</label>
+    </location>
+    <init ref="Idle"/>
+    <transition>
+      <source ref="Idle"/>
+      <target ref="C"/>
+      <label kind="synchronization">fire[p_id][c]!</label>
+      <label kind="assignment">x := 0</label>
+    </transition>
+    <transition>
+      <source ref="C"/>
+      <target ref="Idle"/>
+      <label kind="synchronization">end[p_id][c]?</label>
+      <label kind="guard">x == 3</label>
+    </transition>
+  </template>
+  <template>
+    <name>SDFG</name>
+    <parameter>const int a, const int b, const int c</parameter>
+    <location id="Initial">
+      <name>Initial</name>
+    </location>
+    <init ref="Initial"/>
+    <transition>
+      <source ref="Initial"/>
+      <target ref="Initial"/>
+      <label kind="select">e:id_r</label>
+      <label kind="synchronization">fire[e][a]!</label>
+      <label kind="guard">buff_b2a>=2</label>
+      <label kind="assignment">consume(buff_b2a, 2)</label>
+    </transition>
+    <transition>
+      <source ref="Initial"/>
+      <target ref="Initial"/>
+      <label kind="select">e:id_r</label>
+      <label kind="synchronization">end[e][a]?</label>
+      <label kind="assignment">produce(buff_a2b, 2),
+flag_act := false,
+counter_a++</label>
+      <label kind="comments">Fire_A</label>
+    </transition>
+    <transition>
+      <source ref="Initial"/>
+      <target ref="Initial"/>
+      <label kind="select">e:id_r</label>
+      <label kind="synchronization">fire[e][b]!</label>
+      <label kind="guard">buff_a2b>=1 &amp; buff_c2b>=2 &amp; buff_b2b>=1</label>
+      <label kind="assignment">consume(buff_a2b, 1),
+consume(buff_c2b, 2),
+consume(buff_b2b, 1)</label>
+    </transition>
+    <transition>
+      <source ref="Initial"/>
+      <target ref="Initial"/>
+      <label kind="select">e:id_r</label>
+      <label kind="synchronization">end[e][b]?</label>
+      <label kind="assignment">produce(buff_b2a, 1),
+produce(buff_b2c, 2),
+produce(buff_b2b, 1),
+flag_act := false,
+counter_b++</label>
+      <label kind="comments">Fire_B</label>
+    </transition>
+    <transition>
+      <source ref="Initial"/>
+      <target ref="Initial"/>
+      <label kind="select">e:id_r</label>
+      <label kind="synchronization">fire[e][c]!</label>
+      <label kind="guard">buff_b2c>=3</label>
+      <label kind="assignment">consume(buff_b2c, 3)</label>
+    </transition>
+    <transition>
+      <source ref="Initial"/>
+      <target ref="Initial"/>
+      <label kind="select">e:id_r</label>
+      <label kind="synchronization">end[e][c]?</label>
+      <label kind="assignment">produce(buff_c2b, 3),
+flag_act := false,
+counter_c++</label>
+      <label kind="comments">Fire_C</label>
+    </transition>
+  </template>
+  <system>// Actors
+const int a = 0;
+const int b = 1;
+const int c = 2;
+
+// Templace instances
+const int p1_0 = 0;
+P_p1_0 = P_p1(p1_0, a, b);
+
+const int p1_1 = 1;
+P_p1_1 = P_p1(p1_1, a, b);
+
+const int p2_0 = 2;
+P_p2_0 = P_p2(p2_0, c);
+
+const int p2_1 = 3;
+P_p2_1 = P_p2(p2_1, c);
+
+SDF_Graph = SDFG(a, b, c);
+
+
+// System instantiation
+system SDF_Graph, P_p1_0, P_p1_1, P_p2_0, P_p2_1;
+</system>
+</nta>

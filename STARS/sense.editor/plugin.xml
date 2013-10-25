@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.0"?>
+
+<!--
+-->
+
+<plugin>
+
+   <extension point="org.eclipse.ui.newWizards">
+      <!-- @generated sense -->
+      <category
+            id="org.eclipse.emf.ecore.Wizard.category.ID"
+            name="%_UI_Wizard_category"/>
+      <wizard
+            id="sense.presentation.SenseModelWizardID"
+            name="%_UI_SenseModelWizard_label"
+            class="sense.presentation.SenseModelWizard"
+            category="org.eclipse.emf.ecore.Wizard.category.ID"
+            icon="icons/full/obj16/SenseModelFile.gif">
+         <description>%_UI_SenseModelWizard_description</description>
+         <selection class="org.eclipse.core.resources.IResource"/>
+      </wizard>
+   </extension>
+
+   <extension point="org.eclipse.ui.editors">
+      <!-- @generated sense -->
+      <editor
+            id="sense.presentation.SenseEditorID"
+            name="%_UI_SenseEditor_label"
+            icon="icons/full/obj16/SenseModelFile.gif"
+            extensions="sense"
+            class="sense.presentation.SenseEditor"
+            contributorClass="sense.presentation.SenseActionBarContributor">
+      </editor>
+   </extension>
+
+</plugin>

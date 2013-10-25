@@ -1,0 +1,276 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<nta>
+<declaration>
+// Place global declarations here.
+
+
+//Global Clock
+
+clock global;
+
+
+//# of Processors
+
+
+const int N = 4;  
+//# of Actors      
+const int M = 3 ; 	
+
+
+//Task and Processors IDs
+
+typedef int[0,N-1] id_r;
+
+
+
+
+//Channels
+
+chan end[N][M], fire[N][M];
+
+
+//Buffer and Edge Sizes
+
+int buff_a2b,buff_b2c=0;
+
+int buff_b2a=2;
+int buff_c2b=6;
+
+int buff_b2b=1;
+
+
+
+//Flag to check if SDFG has started
+
+
+bool flag_act=true;
+
+
+
+//Counter for each actor
+
+int counter_a, counter_b, counter_c=0;
+
+
+
+
+
+void produce(int &amp;channel_tokens, int tokens)
+
+{channel_tokens+=tokens;
+}
+
+void consume(int &amp;channel_tokens, int tokens)
+
+{
+channel_tokens-=tokens;
+}
+
+</declaration>
+
+
+<template>
+<name x="5" y="5">SDFG</name>
+<parameter>const int a,const int b,const int c</parameter>
+<declaration>
+// Place local declarations here.
+</declaration>
+
+<location id="id0" x="-736" y="-392">
+<name x="-712" y="-416">Initial</name>
+</location>
+<init ref="id0"/>
+
+<transition>
+<source ref="id0"/>
+<target ref="id0"/>
+<label kind="select" x="-672" y="-296">e:id_r</label>
+<label kind="synchronisation" x="-672" y="-280">end[e][c]?</label>
+<label kind="assignment" x="-672" y="-264">produce(buff_c2b,2),
+flag_act:=false,
+counter_c++</label>
+<label kind="comments">Fire_C</label>
+<nail x="-568" y="-248"/>
+<nail x="-704" y="-248"/>
+</transition>
+
+<transition>
+<source ref="id0"/>
+<target ref="id0"/>
+<label kind="select" x="-624" y="-392">e:id_r</label>
+<label kind="guard" x="-624" y="-376">buff_b2c>=2</label>
+<label kind="synchronisation" x="-624" y="-360">fire[e][c]!</label>
+<label kind="assignment" x="-624" y="-344">consume(buff_b2c,2)</label>
+<label kind="comments">Req_C</label>
+<nail x="-560" y="-400"/>
+<nail x="-560" y="-256"/>
+</transition>
+
+<transition>
+<source ref="id0"/>
+<target ref="id0"/>
+<label kind="select" x="-624" y="-544">e:id_r</label>
+<label kind="synchronisation" x="-624" y="-528">end[e][b]?</label>
+<label kind="assignment" x="-624" y="-512">produce(buff_b2c,3),
+produce(buff_b2a,2),
+produce(buff_b2b,1),
+flag_act:=false,
+counter_b++</label>
+<nail x="-712" y="-512"/>
+<nail x="-632" y="-512"/>
+</transition>
+
+<transition>
+<source ref="id0"/>
+<target ref="id0"/>
+<label kind="select" x="-960" y="-552">e:id_r</label>
+<label kind="guard" x="-960" y="-536">buff_a2b>=2&amp;buff_c2b>=3&amp;buff_b2b>=1</label>
+<label kind="synchronisation" x="-960" y="-520">fire[e][b]!</label>
+<label kind="assignment" x="-960" y="-504">consume(buff_a2b,2),
+consume(buff_c2b,3),
+consume(buff_b2b,1)</label>
+<label kind="comments">Req_B</label>
+      <nail x="-832" y="-512"/>
+      <nail x="-752" y="-512"/>
+</transition>
+
+<transition>
+<source ref="id0"/>
+<target ref="id0"/>
+<label kind="select" x="-840" y="-296">e:id_r</label>
+<label kind="synchronisation" x="-840" y="-280">end[e][a]?</label>
+<label kind="assignment" x="-840" y="-264">produce(buff_a2b,1),
+flag_act:=false,
+counter_a++</label>
+<label kind="comments">Fire_A</label>
+<nail x="-888" y="-248"/>
+<nail x="-760" y="-248"/>
+</transition>
+
+<transition>
+<source ref="id0"/>
+<target ref="id0"/>
+<label kind="select" x="-968" y="-400">e:id_r</label>
+<label kind="guard" x="-968" y="-384">buff_b2a>=1</label>
+<label kind="synchronisation" x="-968" y="-368">fire[e][a]!</label>
+<label kind="assignment" x="-968" y="-352">consume(buff_b2a,1)</label>
+<label kind="comments">Req_A</label>
+<nail x="-888" y="-384"/>
+<nail x="-888" y="-264"/>
+</transition>
+
+</template>
+
+<template>
+<name>Processor</name>
+<parameter>const int p_id, const int a,const int b,const int c</parameter>
+<declaration>clock x;</declaration>
+
+<location id="id1" x="-1928" y="-1080">
+<name x="-1952" y="-1112">InUse_c</name>
+<label kind="invariant" x="-1944" y="-1072">x&lt;=3</label>
+</location>
+
+<location id="id2" x="-2112" y="-960">
+<name x="-2128" y="-992">InUse_b</name>
+<label kind="invariant" x="-2128" y="-952">x&lt;=2</label>
+</location>
+
+<location id="id3" x="-1752" y="-960">
+<name x="-1784" y="-992">InUse_a</name>
+<label kind="invariant" x="-1768" y="-952">x&lt;=2</label>
+</location>
+
+<location id="id4" x="-1928" y="-960">
+<name x="-1938" y="-990">Idle</name>
+</location>
+<init ref="id4"/>
+
+<transition>
+<source ref="id1"/>
+<target ref="id4"/>
+<label kind="guard" x="-1880" y="-1104">x==3</label>
+<label kind="synchronisation" x="-1904" y="-1080">end[p_id][c]!</label>
+<nail x="-1808" y="-1080"/>
+</transition>
+
+<transition>
+<source ref="id4"/>
+<target ref="id1"/>
+<label kind="synchronisation" x="-2040" y="-1080">fire[p_id][c]?</label>
+<label kind="assignment" x="-2040" y="-1104">x:=0</label>
+<nail x="-2064" y="-1080"/>
+</transition>
+
+<transition>
+<source ref="id2"/>
+      <target ref="id4"/>
+      <label kind="guard" x="-2096" y="-896">x==2</label>
+<label kind="synchronisation" x="-2096" y="-880">end[p_id][b]!</label>
+<nail x="-2112" y="-856"/>
+<nail x="-2000" y="-856"/>
+</transition>
+
+<transition>
+<source ref="id4"/>
+<target ref="id2"/>
+<label kind="synchronisation" x="-2056" y="-984">fire[p_id][b]?</label>
+<label kind="assignment" x="-2048" y="-960">x:=0</label>
+</transition>
+
+<transition>
+<source ref="id3"/>
+<target ref="id4"/>
+<label kind="guard" x="-1848" y="-896">x==2</label>
+<label kind="synchronisation" x="-1848" y="-880">end[p_id][a]!</label>
+<nail x="-1752" y="-856"/>
+<nail x="-1856" y="-856"/>
+</transition>
+
+<transition>
+<source ref="id4"/>
+<target ref="id3"/>
+<label kind="synchronisation" x="-1880" y="-984">fire[p_id][a]?</label>
+<label kind="assignment" x="-1872" y="-960">x:=0</label>
+</transition>
+
+</template>
+
+<system>
+// Place template instantiations here.
+
+
+const int a=0;
+
+const int b=1;
+
+const int c=2;
+
+const int p0=0;
+
+const int p1=1;
+
+const int p2=2;
+
+const int p3=3;
+
+
+
+Processor0 = Processor(p0,a,b,c);
+
+Processor1 = Processor(p1,a,b,c);
+
+Processor2 = Processor(p2,a,b,c);
+
+Processor3 = Processor(p3,a,b,c);
+
+
+SDF_Graph = SDFG(a,b,c);
+
+
+
+// List one or more processes to be composed into a system.
+system SDF_Graph, Processor0,Processor1, Processor2, Processor3;
+</system>
+
+</nta>

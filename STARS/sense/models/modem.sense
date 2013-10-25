@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="ASCII"?>
+<SenseModel xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns="sense">
+  <actors name="fork1" inChannels="//@channels.18 //@channels.19" outChannels="//@channels.0 //@channels.1 //@channels.19"/>
+  <actors name="biq" inChannels="//@channels.0 //@channels.20" outChannels="//@channels.2 //@channels.20"/>
+  <actors name="bi" inChannels="//@channels.1 //@channels.21" outChannels="//@channels.3 //@channels.21"/>
+  <actors name="add" inChannels="//@channels.2 //@channels.3 //@channels.22" outChannels="//@channels.4 //@channels.22"/>
+  <actors name="ac" inChannels="//@channels.4 //@channels.23" outChannels="//@channels.5 //@channels.23"/>
+  <actors name="fork2" inChannels="//@channels.5 //@channels.24" outChannels="//@channels.6 //@channels.7 //@channels.24"/>
+  <actors name="conj" inChannels="//@channels.6 //@channels.25" outChannels="//@channels.8 //@channels.25"/>
+  <actors name="mul1" inChannels="//@channels.7 //@channels.14 //@channels.26" outChannels="//@channels.9 //@channels.26"/>
+  <actors name="in" inChannels="//@channels.27" outChannels="//@channels.11 //@channels.27"/>
+  <actors name="filt" inChannels="//@channels.11 //@channels.28" outChannels="//@channels.12 //@channels.28"/>
+  <actors name="hil" inChannels="//@channels.12 //@channels.29" outChannels="//@channels.13 //@channels.29"/>
+  <actors name="eq" inChannels="//@channels.10 //@channels.13 //@channels.30" outChannels="//@channels.14 //@channels.30"/>
+  <actors name="mul2" inChannels="//@channels.8 //@channels.15 //@channels.31" outChannels="//@channels.10 //@channels.31"/>
+  <actors name="deci" inChannels="//@channels.9 //@channels.32" outChannels="//@channels.15 //@channels.16 //@channels.18 //@channels.32"/>
+  <actors name="deco" inChannels="//@channels.16 //@channels.33" outChannels="//@channels.17 //@channels.33"/>
+  <actors name="out" inChannels="//@channels.17 //@channels.34" outChannels="//@channels.34"/>
+  <processors name="p1" count="2" capabilities="//@capabilities.0 //@capabilities.1 //@capabilities.2 //@capabilities.3 //@capabilities.4 //@capabilities.5 //@capabilities.6 //@capabilities.7 //@capabilities.8 //@capabilities.9 //@capabilities.10 //@capabilities.11 //@capabilities.12 //@capabilities.13 //@capabilities.14 //@capabilities.15"/>
+  <channels name="a" source="//@actors.0" target="//@actors.1"/>
+  <channels name="b" source="//@actors.0" target="//@actors.2"/>
+  <channels name="c" source="//@actors.1" target="//@actors.3"/>
+  <channels name="d" source="//@actors.2" target="//@actors.3"/>
+  <channels name="e" source="//@actors.3" target="//@actors.4"/>
+  <channels name="f" source="//@actors.4" sourceRate="2" target="//@actors.5"/>
+  <channels name="g" source="//@actors.5" target="//@actors.6" targetRate="2"/>
+  <channels name="h" source="//@actors.5" target="//@actors.7" targetRate="2"/>
+  <channels name="i" source="//@actors.6" sourceRate="2" target="//@actors.12" targetRate="2"/>
+  <channels name="j" source="//@actors.7" sourceRate="2" target="//@actors.13" targetRate="2"/>
+  <channels name="k" initialTokens="2" source="//@actors.12" sourceRate="2" target="//@actors.11" targetRate="2"/>
+  <channels name="l" source="//@actors.8" target="//@actors.9"/>
+  <channels name="m" source="//@actors.9" target="//@actors.10" targetRate="8"/>
+  <channels name="n" source="//@actors.10" sourceRate="2" target="//@actors.11" targetRate="4"/>
+  <channels name="o" source="//@actors.11" sourceRate="2" target="//@actors.7" targetRate="2"/>
+  <channels name="p" source="//@actors.13" sourceRate="2" target="//@actors.12" targetRate="2"/>
+  <channels name="q" source="//@actors.13" sourceRate="2" target="//@actors.14" targetRate="2"/>
+  <channels name="r" source="//@actors.14" target="//@actors.15"/>
+  <channels name="s" initialTokens="1" source="//@actors.13" target="//@actors.0"/>
+  <channels name="_ch20" initialTokens="1" source="//@actors.0" target="//@actors.0"/>
+  <channels name="_ch21" initialTokens="1" source="//@actors.1" target="//@actors.1"/>
+  <channels name="_ch22" initialTokens="1" source="//@actors.2" target="//@actors.2"/>
+  <channels name="_ch23" initialTokens="1" source="//@actors.3" target="//@actors.3"/>
+  <channels name="_ch24" initialTokens="1" source="//@actors.4" target="//@actors.4"/>
+  <channels name="_ch25" initialTokens="1" source="//@actors.5" target="//@actors.5"/>
+  <channels name="_ch26" initialTokens="1" source="//@actors.6" target="//@actors.6"/>
+  <channels name="_ch27" initialTokens="1" source="//@actors.7" target="//@actors.7"/>
+  <channels name="_ch28" initialTokens="1" source="//@actors.8" target="//@actors.8"/>
+  <channels name="_ch29" initialTokens="1" source="//@actors.9" target="//@actors.9"/>
+  <channels name="_ch30" initialTokens="1" source="//@actors.10" target="//@actors.10"/>
+  <channels name="_ch31" initialTokens="1" source="//@actors.11" target="//@actors.11"/>
+  <channels name="_ch32" initialTokens="1" source="//@actors.12" target="//@actors.12"/>
+  <channels name="_ch33" initialTokens="1" source="//@actors.13" target="//@actors.13"/>
+  <channels name="_ch34" initialTokens="1" source="//@actors.14" target="//@actors.14"/>
+  <channels name="_ch35" initialTokens="1" source="//@actors.15" target="//@actors.15"/>
+  <capabilities processor="//@processors.0" performs="//@actors.0"/>
+  <capabilities processor="//@processors.0" performs="//@actors.1"/>
+  <capabilities processor="//@processors.0" performs="//@actors.2"/>
+  <capabilities processor="//@processors.0" performs="//@actors.3"/>
+  <capabilities processor="//@processors.0" performs="//@actors.4"/>
+  <capabilities processor="//@processors.0" performs="//@actors.5"/>
+  <capabilities processor="//@processors.0" performs="//@actors.6"/>
+  <capabilities processor="//@processors.0" performs="//@actors.7"/>
+  <capabilities processor="//@processors.0" performs="//@actors.8"/>
+  <capabilities processor="//@processors.0" performs="//@actors.9"/>
+  <capabilities processor="//@processors.0" performs="//@actors.10"/>
+  <capabilities processor="//@processors.0" performs="//@actors.11"/>
+  <capabilities processor="//@processors.0" performs="//@actors.12"/>
+  <capabilities processor="//@processors.0" performs="//@actors.13"/>
+  <capabilities processor="//@processors.0" performs="//@actors.14"/>
+  <capabilities processor="//@processors.0" performs="//@actors.15"/>
+</SenseModel>

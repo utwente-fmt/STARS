@@ -1,0 +1,713 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<nta>
+  <declaration>// Global Clock
+clock global;
+
+// # of Processors
+const int N = 2;
+// # of Actors   
+const int M = 16;
+
+// Task and Processors IDs
+typedef int[0,N-1] id_r;
+
+// Channels
+chan end[N][M], fire[N][M];
+
+// Buffer and Edge Sizes
+int buff_a = 0;
+int buff_b = 0;
+int buff_c = 0;
+int buff_d = 0;
+int buff_e = 0;
+int buff_f = 0;
+int buff_g = 0;
+int buff_h = 0;
+int buff_i = 0;
+int buff_j = 0;
+int buff_k = 2;
+int buff_l = 0;
+int buff_m = 0;
+int buff_n = 0;
+int buff_o = 0;
+int buff_p = 0;
+int buff_q = 0;
+int buff_r = 0;
+int buff_s = 1;
+int buff__ch20 = 1;
+int buff__ch21 = 1;
+int buff__ch22 = 1;
+int buff__ch23 = 1;
+int buff__ch24 = 1;
+int buff__ch25 = 1;
+int buff__ch26 = 1;
+int buff__ch27 = 1;
+int buff__ch28 = 1;
+int buff__ch29 = 1;
+int buff__ch30 = 1;
+int buff__ch31 = 1;
+int buff__ch32 = 1;
+int buff__ch33 = 1;
+int buff__ch34 = 1;
+int buff__ch35 = 1;
+
+// Flag to check if SDFG has started
+bool flag_act=true;
+
+// Counter for each actor
+int counter_fork1 = 0;
+int counter_biq = 0;
+int counter_bi = 0;
+int counter_add = 0;
+int counter_ac = 0;
+int counter_fork2 = 0;
+int counter_conj = 0;
+int counter_mul1 = 0;
+int counter_in = 0;
+int counter_filt = 0;
+int counter_hil = 0;
+int counter_eq = 0;
+int counter_mul2 = 0;
+int counter_deci = 0;
+int counter_deco = 0;
+int counter_out = 0;
+
+void produce(int &amp;channel_tokens, int tokens) {
+    channel_tokens+=tokens;
+}
+
+void consume(int &amp;channel_tokens, int tokens) {
+    channel_tokens-=tokens;
+}
+</declaration>
+  <template>
+    <name>P_p1</name>
+    <parameter>const int p_id, const int fork1, const int biq, const int bi, const int add, const int ac, const int fork2, const int conj, const int mul1, const int in, const int filt, const int hil, const int eq, const int mul2, const int deci, const int deco, const int out</parameter>
+    <declaration>clock x;</declaration>
+    <location id="Idle">
+      <name>Idle</name>
+    </location>
+    <location id="fork1">
+      <name>InUse_fork1</name>
+      <label kind="invariant">x &lt;= 1</label>
+    </location>
+    <location id="biq">
+      <name>InUse_biq</name>
+      <label kind="invariant">x &lt;= 1</label>
+    </location>
+    <location id="bi">
+      <name>InUse_bi</name>
+      <label kind="invariant">x &lt;= 1</label>
+    </location>
+    <location id="add">
+      <name>InUse_add</name>
+      <label kind="invariant">x &lt;= 1</label>
+    </location>
+    <location id="ac">
+      <name>InUse_ac</name>
+      <label kind="invariant">x &lt;= 1</label>
+    </location>
+    <location id="fork2">
+      <name>InUse_fork2</name>
+      <label kind="invariant">x &lt;= 1</label>
+    </location>
+    <location id="conj">
+      <name>InUse_conj</name>
+      <label kind="invariant">x &lt;= 1</label>
+    </location>
+    <location id="mul1">
+      <name>InUse_mul1</name>
+      <label kind="invariant">x &lt;= 1</label>
+    </location>
+    <location id="in">
+      <name>InUse_in</name>
+      <label kind="invariant">x &lt;= 1</label>
+    </location>
+    <location id="filt">
+      <name>InUse_filt</name>
+      <label kind="invariant">x &lt;= 1</label>
+    </location>
+    <location id="hil">
+      <name>InUse_hil</name>
+      <label kind="invariant">x &lt;= 1</label>
+    </location>
+    <location id="eq">
+      <name>InUse_eq</name>
+      <label kind="invariant">x &lt;= 1</label>
+    </location>
+    <location id="mul2">
+      <name>InUse_mul2</name>
+      <label kind="invariant">x &lt;= 1</label>
+    </location>
+    <location id="deci">
+      <name>InUse_deci</name>
+      <label kind="invariant">x &lt;= 1</label>
+    </location>
+    <location id="deco">
+      <name>InUse_deco</name>
+      <label kind="invariant">x &lt;= 1</label>
+    </location>
+    <location id="out">
+      <name>InUse_out</name>
+      <label kind="invariant">x &lt;= 1</label>
+    </location>
+    <init ref="Idle"/>
+    <transition>
+      <source ref="Idle"/>
+      <target ref="fork1"/>
+      <label kind="synchronisation">fire[p_id][fork1]?</label>
+      <label kind="assignment">x := 0</label>
+    </transition>
+    <transition>
+      <source ref="fork1"/>
+      <target ref="Idle"/>
+      <label kind="synchronisation">end[p_id][fork1]!</label>
+      <label kind="guard">x == 1</label>
+    </transition>
+    <transition>
+      <source ref="Idle"/>
+      <target ref="biq"/>
+      <label kind="synchronisation">fire[p_id][biq]?</label>
+      <label kind="assignment">x := 0</label>
+    </transition>
+    <transition>
+      <source ref="biq"/>
+      <target ref="Idle"/>
+      <label kind="synchronisation">end[p_id][biq]!</label>
+      <label kind="guard">x == 1</label>
+    </transition>
+    <transition>
+      <source ref="Idle"/>
+      <target ref="bi"/>
+      <label kind="synchronisation">fire[p_id][bi]?</label>
+      <label kind="assignment">x := 0</label>
+    </transition>
+    <transition>
+      <source ref="bi"/>
+      <target ref="Idle"/>
+      <label kind="synchronisation">end[p_id][bi]!</label>
+      <label kind="guard">x == 1</label>
+    </transition>
+    <transition>
+      <source ref="Idle"/>
+      <target ref="add"/>
+      <label kind="synchronisation">fire[p_id][add]?</label>
+      <label kind="assignment">x := 0</label>
+    </transition>
+    <transition>
+      <source ref="add"/>
+      <target ref="Idle"/>
+      <label kind="synchronisation">end[p_id][add]!</label>
+      <label kind="guard">x == 1</label>
+    </transition>
+    <transition>
+      <source ref="Idle"/>
+      <target ref="ac"/>
+      <label kind="synchronisation">fire[p_id][ac]?</label>
+      <label kind="assignment">x := 0</label>
+    </transition>
+    <transition>
+      <source ref="ac"/>
+      <target ref="Idle"/>
+      <label kind="synchronisation">end[p_id][ac]!</label>
+      <label kind="guard">x == 1</label>
+    </transition>
+    <transition>
+      <source ref="Idle"/>
+      <target ref="fork2"/>
+      <label kind="synchronisation">fire[p_id][fork2]?</label>
+      <label kind="assignment">x := 0</label>
+    </transition>
+    <transition>
+      <source ref="fork2"/>
+      <target ref="Idle"/>
+      <label kind="synchronisation">end[p_id][fork2]!</label>
+      <label kind="guard">x == 1</label>
+    </transition>
+    <transition>
+      <source ref="Idle"/>
+      <target ref="conj"/>
+      <label kind="synchronisation">fire[p_id][conj]?</label>
+      <label kind="assignment">x := 0</label>
+    </transition>
+    <transition>
+      <source ref="conj"/>
+      <target ref="Idle"/>
+      <label kind="synchronisation">end[p_id][conj]!</label>
+      <label kind="guard">x == 1</label>
+    </transition>
+    <transition>
+      <source ref="Idle"/>
+      <target ref="mul1"/>
+      <label kind="synchronisation">fire[p_id][mul1]?</label>
+      <label kind="assignment">x := 0</label>
+    </transition>
+    <transition>
+      <source ref="mul1"/>
+      <target ref="Idle"/>
+      <label kind="synchronisation">end[p_id][mul1]!</label>
+      <label kind="guard">x == 1</label>
+    </transition>
+    <transition>
+      <source ref="Idle"/>
+      <target ref="in"/>
+      <label kind="synchronisation">fire[p_id][in]?</label>
+      <label kind="assignment">x := 0</label>
+    </transition>
+    <transition>
+      <source ref="in"/>
+      <target ref="Idle"/>
+      <label kind="synchronisation">end[p_id][in]!</label>
+      <label kind="guard">x == 1</label>
+    </transition>
+    <transition>
+      <source ref="Idle"/>
+      <target ref="filt"/>
+      <label kind="synchronisation">fire[p_id][filt]?</label>
+      <label kind="assignment">x := 0</label>
+    </transition>
+    <transition>
+      <source ref="filt"/>
+      <target ref="Idle"/>
+      <label kind="synchronisation">end[p_id][filt]!</label>
+      <label kind="guard">x == 1</label>
+    </transition>
+    <transition>
+      <source ref="Idle"/>
+      <target ref="hil"/>
+      <label kind="synchronisation">fire[p_id][hil]?</label>
+      <label kind="assignment">x := 0</label>
+    </transition>
+    <transition>
+      <source ref="hil"/>
+      <target ref="Idle"/>
+      <label kind="synchronisation">end[p_id][hil]!</label>
+      <label kind="guard">x == 1</label>
+    </transition>
+    <transition>
+      <source ref="Idle"/>
+      <target ref="eq"/>
+      <label kind="synchronisation">fire[p_id][eq]?</label>
+      <label kind="assignment">x := 0</label>
+    </transition>
+    <transition>
+      <source ref="eq"/>
+      <target ref="Idle"/>
+      <label kind="synchronisation">end[p_id][eq]!</label>
+      <label kind="guard">x == 1</label>
+    </transition>
+    <transition>
+      <source ref="Idle"/>
+      <target ref="mul2"/>
+      <label kind="synchronisation">fire[p_id][mul2]?</label>
+      <label kind="assignment">x := 0</label>
+    </transition>
+    <transition>
+      <source ref="mul2"/>
+      <target ref="Idle"/>
+      <label kind="synchronisation">end[p_id][mul2]!</label>
+      <label kind="guard">x == 1</label>
+    </transition>
+    <transition>
+      <source ref="Idle"/>
+      <target ref="deci"/>
+      <label kind="synchronisation">fire[p_id][deci]?</label>
+      <label kind="assignment">x := 0</label>
+    </transition>
+    <transition>
+      <source ref="deci"/>
+      <target ref="Idle"/>
+      <label kind="synchronisation">end[p_id][deci]!</label>
+      <label kind="guard">x == 1</label>
+    </transition>
+    <transition>
+      <source ref="Idle"/>
+      <target ref="deco"/>
+      <label kind="synchronisation">fire[p_id][deco]?</label>
+      <label kind="assignment">x := 0</label>
+    </transition>
+    <transition>
+      <source ref="deco"/>
+      <target ref="Idle"/>
+      <label kind="synchronisation">end[p_id][deco]!</label>
+      <label kind="guard">x == 1</label>
+    </transition>
+    <transition>
+      <source ref="Idle"/>
+      <target ref="out"/>
+      <label kind="synchronisation">fire[p_id][out]?</label>
+      <label kind="assignment">x := 0</label>
+    </transition>
+    <transition>
+      <source ref="out"/>
+      <target ref="Idle"/>
+      <label kind="synchronisation">end[p_id][out]!</label>
+      <label kind="guard">x == 1</label>
+    </transition>
+  </template>
+  <template>
+    <name>SDFG</name>
+    <parameter>const int fork1, const int biq, const int bi, const int add, const int ac, const int fork2, const int conj, const int mul1, const int in, const int filt, const int hil, const int eq, const int mul2, const int deci, const int deco, const int out</parameter>
+    <location id="Initial">
+      <name>Initial</name>
+    </location>
+    <init ref="Initial"/>
+    <transition>
+      <source ref="Initial"/>
+      <target ref="Initial"/>
+      <label kind="select">e:id_r</label>
+      <label kind="synchronisation">fire[e][fork1]!</label>
+      <label kind="guard">buff_s>=1 &amp; buff__ch20>=1</label>
+      <label kind="assignment">consume(buff_s, 1),
+consume(buff__ch20, 1)</label>
+    </transition>
+    <transition>
+      <source ref="Initial"/>
+      <target ref="Initial"/>
+      <label kind="select">e:id_r</label>
+      <label kind="synchronisation">end[e][fork1]?</label>
+      <label kind="assignment">produce(buff_a, 1),
+produce(buff_b, 1),
+produce(buff__ch20, 1),
+flag_act := false,
+counter_fork1++</label>
+      <label kind="comments">Fire_fork1</label>
+    </transition>
+    <transition>
+      <source ref="Initial"/>
+      <target ref="Initial"/>
+      <label kind="select">e:id_r</label>
+      <label kind="synchronisation">fire[e][biq]!</label>
+      <label kind="guard">buff_a>=1 &amp; buff__ch21>=1</label>
+      <label kind="assignment">consume(buff_a, 1),
+consume(buff__ch21, 1)</label>
+    </transition>
+    <transition>
+      <source ref="Initial"/>
+      <target ref="Initial"/>
+      <label kind="select">e:id_r</label>
+      <label kind="synchronisation">end[e][biq]?</label>
+      <label kind="assignment">produce(buff_c, 1),
+produce(buff__ch21, 1),
+flag_act := false,
+counter_biq++</label>
+      <label kind="comments">Fire_biq</label>
+    </transition>
+    <transition>
+      <source ref="Initial"/>
+      <target ref="Initial"/>
+      <label kind="select">e:id_r</label>
+      <label kind="synchronisation">fire[e][bi]!</label>
+      <label kind="guard">buff_b>=1 &amp; buff__ch22>=1</label>
+      <label kind="assignment">consume(buff_b, 1),
+consume(buff__ch22, 1)</label>
+    </transition>
+    <transition>
+      <source ref="Initial"/>
+      <target ref="Initial"/>
+      <label kind="select">e:id_r</label>
+      <label kind="synchronisation">end[e][bi]?</label>
+      <label kind="assignment">produce(buff_d, 1),
+produce(buff__ch22, 1),
+flag_act := false,
+counter_bi++</label>
+      <label kind="comments">Fire_bi</label>
+    </transition>
+    <transition>
+      <source ref="Initial"/>
+      <target ref="Initial"/>
+      <label kind="select">e:id_r</label>
+      <label kind="synchronisation">fire[e][add]!</label>
+      <label kind="guard">buff_c>=1 &amp; buff_d>=1 &amp; buff__ch23>=1</label>
+      <label kind="assignment">consume(buff_c, 1),
+consume(buff_d, 1),
+consume(buff__ch23, 1)</label>
+    </transition>
+    <transition>
+      <source ref="Initial"/>
+      <target ref="Initial"/>
+      <label kind="select">e:id_r</label>
+      <label kind="synchronisation">end[e][add]?</label>
+      <label kind="assignment">produce(buff_e, 1),
+produce(buff__ch23, 1),
+flag_act := false,
+counter_add++</label>
+      <label kind="comments">Fire_add</label>
+    </transition>
+    <transition>
+      <source ref="Initial"/>
+      <target ref="Initial"/>
+      <label kind="select">e:id_r</label>
+      <label kind="synchronisation">fire[e][ac]!</label>
+      <label kind="guard">buff_e>=1 &amp; buff__ch24>=1</label>
+      <label kind="assignment">consume(buff_e, 1),
+consume(buff__ch24, 1)</label>
+    </transition>
+    <transition>
+      <source ref="Initial"/>
+      <target ref="Initial"/>
+      <label kind="select">e:id_r</label>
+      <label kind="synchronisation">end[e][ac]?</label>
+      <label kind="assignment">produce(buff_f, 1),
+produce(buff__ch24, 1),
+flag_act := false,
+counter_ac++</label>
+      <label kind="comments">Fire_ac</label>
+    </transition>
+    <transition>
+      <source ref="Initial"/>
+      <target ref="Initial"/>
+      <label kind="select">e:id_r</label>
+      <label kind="synchronisation">fire[e][fork2]!</label>
+      <label kind="guard">buff_f>=2 &amp; buff__ch25>=1</label>
+      <label kind="assignment">consume(buff_f, 2),
+consume(buff__ch25, 1)</label>
+    </transition>
+    <transition>
+      <source ref="Initial"/>
+      <target ref="Initial"/>
+      <label kind="select">e:id_r</label>
+      <label kind="synchronisation">end[e][fork2]?</label>
+      <label kind="assignment">produce(buff_g, 2),
+produce(buff_h, 2),
+produce(buff__ch25, 1),
+flag_act := false,
+counter_fork2++</label>
+      <label kind="comments">Fire_fork2</label>
+    </transition>
+    <transition>
+      <source ref="Initial"/>
+      <target ref="Initial"/>
+      <label kind="select">e:id_r</label>
+      <label kind="synchronisation">fire[e][conj]!</label>
+      <label kind="guard">buff_g>=1 &amp; buff__ch26>=1</label>
+      <label kind="assignment">consume(buff_g, 1),
+consume(buff__ch26, 1)</label>
+    </transition>
+    <transition>
+      <source ref="Initial"/>
+      <target ref="Initial"/>
+      <label kind="select">e:id_r</label>
+      <label kind="synchronisation">end[e][conj]?</label>
+      <label kind="assignment">produce(buff_i, 2),
+produce(buff__ch26, 1),
+flag_act := false,
+counter_conj++</label>
+      <label kind="comments">Fire_conj</label>
+    </transition>
+    <transition>
+      <source ref="Initial"/>
+      <target ref="Initial"/>
+      <label kind="select">e:id_r</label>
+      <label kind="synchronisation">fire[e][mul1]!</label>
+      <label kind="guard">buff_h>=1 &amp; buff_o>=2 &amp; buff__ch27>=1</label>
+      <label kind="assignment">consume(buff_h, 1),
+consume(buff_o, 2),
+consume(buff__ch27, 1)</label>
+    </transition>
+    <transition>
+      <source ref="Initial"/>
+      <target ref="Initial"/>
+      <label kind="select">e:id_r</label>
+      <label kind="synchronisation">end[e][mul1]?</label>
+      <label kind="assignment">produce(buff_j, 2),
+produce(buff__ch27, 1),
+flag_act := false,
+counter_mul1++</label>
+      <label kind="comments">Fire_mul1</label>
+    </transition>
+    <transition>
+      <source ref="Initial"/>
+      <target ref="Initial"/>
+      <label kind="select">e:id_r</label>
+      <label kind="synchronisation">fire[e][in]!</label>
+      <label kind="guard">buff__ch28>=1</label>
+      <label kind="assignment">consume(buff__ch28, 1)</label>
+    </transition>
+    <transition>
+      <source ref="Initial"/>
+      <target ref="Initial"/>
+      <label kind="select">e:id_r</label>
+      <label kind="synchronisation">end[e][in]?</label>
+      <label kind="assignment">produce(buff_l, 1),
+produce(buff__ch28, 1),
+flag_act := false,
+counter_in++</label>
+      <label kind="comments">Fire_in</label>
+    </transition>
+    <transition>
+      <source ref="Initial"/>
+      <target ref="Initial"/>
+      <label kind="select">e:id_r</label>
+      <label kind="synchronisation">fire[e][filt]!</label>
+      <label kind="guard">buff_l>=1 &amp; buff__ch29>=1</label>
+      <label kind="assignment">consume(buff_l, 1),
+consume(buff__ch29, 1)</label>
+    </transition>
+    <transition>
+      <source ref="Initial"/>
+      <target ref="Initial"/>
+      <label kind="select">e:id_r</label>
+      <label kind="synchronisation">end[e][filt]?</label>
+      <label kind="assignment">produce(buff_m, 8),
+produce(buff__ch29, 1),
+flag_act := false,
+counter_filt++</label>
+      <label kind="comments">Fire_filt</label>
+    </transition>
+    <transition>
+      <source ref="Initial"/>
+      <target ref="Initial"/>
+      <label kind="select">e:id_r</label>
+      <label kind="synchronisation">fire[e][hil]!</label>
+      <label kind="guard">buff_m>=1 &amp; buff__ch30>=1</label>
+      <label kind="assignment">consume(buff_m, 1),
+consume(buff__ch30, 1)</label>
+    </transition>
+    <transition>
+      <source ref="Initial"/>
+      <target ref="Initial"/>
+      <label kind="select">e:id_r</label>
+      <label kind="synchronisation">end[e][hil]?</label>
+      <label kind="assignment">produce(buff_n, 4),
+produce(buff__ch30, 1),
+flag_act := false,
+counter_hil++</label>
+      <label kind="comments">Fire_hil</label>
+    </transition>
+    <transition>
+      <source ref="Initial"/>
+      <target ref="Initial"/>
+      <label kind="select">e:id_r</label>
+      <label kind="synchronisation">fire[e][eq]!</label>
+      <label kind="guard">buff_k>=2 &amp; buff_n>=2 &amp; buff__ch31>=1</label>
+      <label kind="assignment">consume(buff_k, 2),
+consume(buff_n, 2),
+consume(buff__ch31, 1)</label>
+    </transition>
+    <transition>
+      <source ref="Initial"/>
+      <target ref="Initial"/>
+      <label kind="select">e:id_r</label>
+      <label kind="synchronisation">end[e][eq]?</label>
+      <label kind="assignment">produce(buff_o, 2),
+produce(buff__ch31, 1),
+flag_act := false,
+counter_eq++</label>
+      <label kind="comments">Fire_eq</label>
+    </transition>
+    <transition>
+      <source ref="Initial"/>
+      <target ref="Initial"/>
+      <label kind="select">e:id_r</label>
+      <label kind="synchronisation">fire[e][mul2]!</label>
+      <label kind="guard">buff_i>=2 &amp; buff_p>=2 &amp; buff__ch32>=1</label>
+      <label kind="assignment">consume(buff_i, 2),
+consume(buff_p, 2),
+consume(buff__ch32, 1)</label>
+    </transition>
+    <transition>
+      <source ref="Initial"/>
+      <target ref="Initial"/>
+      <label kind="select">e:id_r</label>
+      <label kind="synchronisation">end[e][mul2]?</label>
+      <label kind="assignment">produce(buff_k, 2),
+produce(buff__ch32, 1),
+flag_act := false,
+counter_mul2++</label>
+      <label kind="comments">Fire_mul2</label>
+    </transition>
+    <transition>
+      <source ref="Initial"/>
+      <target ref="Initial"/>
+      <label kind="select">e:id_r</label>
+      <label kind="synchronisation">fire[e][deci]!</label>
+      <label kind="guard">buff_j>=2 &amp; buff__ch33>=1</label>
+      <label kind="assignment">consume(buff_j, 2),
+consume(buff__ch33, 1)</label>
+    </transition>
+    <transition>
+      <source ref="Initial"/>
+      <target ref="Initial"/>
+      <label kind="select">e:id_r</label>
+      <label kind="synchronisation">end[e][deci]?</label>
+      <label kind="assignment">produce(buff_p, 2),
+produce(buff_q, 2),
+produce(buff_s, 1),
+produce(buff__ch33, 1),
+flag_act := false,
+counter_deci++</label>
+      <label kind="comments">Fire_deci</label>
+    </transition>
+    <transition>
+      <source ref="Initial"/>
+      <target ref="Initial"/>
+      <label kind="select">e:id_r</label>
+      <label kind="synchronisation">fire[e][deco]!</label>
+      <label kind="guard">buff_q>=2 &amp; buff__ch34>=1</label>
+      <label kind="assignment">consume(buff_q, 2),
+consume(buff__ch34, 1)</label>
+    </transition>
+    <transition>
+      <source ref="Initial"/>
+      <target ref="Initial"/>
+      <label kind="select">e:id_r</label>
+      <label kind="synchronisation">end[e][deco]?</label>
+      <label kind="assignment">produce(buff_r, 1),
+produce(buff__ch34, 1),
+flag_act := false,
+counter_deco++</label>
+      <label kind="comments">Fire_deco</label>
+    </transition>
+    <transition>
+      <source ref="Initial"/>
+      <target ref="Initial"/>
+      <label kind="select">e:id_r</label>
+      <label kind="synchronisation">fire[e][out]!</label>
+      <label kind="guard">buff_r>=1 &amp; buff__ch35>=1</label>
+      <label kind="assignment">consume(buff_r, 1),
+consume(buff__ch35, 1)</label>
+    </transition>
+    <transition>
+      <source ref="Initial"/>
+      <target ref="Initial"/>
+      <label kind="select">e:id_r</label>
+      <label kind="synchronisation">end[e][out]?</label>
+      <label kind="assignment">produce(buff__ch35, 1),
+flag_act := false,
+counter_out++</label>
+      <label kind="comments">Fire_out</label>
+    </transition>
+  </template>
+  <system>// Actors
+const int fork1 = 0;
+const int biq = 1;
+const int bi = 2;
+const int add = 3;
+const int ac = 4;
+const int fork2 = 5;
+const int conj = 6;
+const int mul1 = 7;
+const int in = 8;
+const int filt = 9;
+const int hil = 10;
+const int eq = 11;
+const int mul2 = 12;
+const int deci = 13;
+const int deco = 14;
+const int out = 15;
+
+// Templace instances
+const int p1_0 = 0;
+P_p1_0 = P_p1(p1_0, fork1, biq, bi, add, ac, fork2, conj, mul1, in, filt, hil, eq, mul2, deci, deco, out);
+
+const int p1_1 = 1;
+P_p1_1 = P_p1(p1_1, fork1, biq, bi, add, ac, fork2, conj, mul1, in, filt, hil, eq, mul2, deci, deco, out);
+
+SDF_Graph = SDFG(fork1, biq, bi, add, ac, fork2, conj, mul1, in, filt, hil, eq, mul2, deci, deco, out);
+
+
+// System instantiation
+system SDF_Graph, P_p1_0, P_p1_1;
+</system>
+</nta>

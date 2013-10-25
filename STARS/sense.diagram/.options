@@ -1,0 +1,7 @@
+# Tracing options for the sense.diagram plug-in
+
+# Common issues
+sense.diagram/debug=false
+
+# Visual IDs
+sense.diagram/debug/visualID=false

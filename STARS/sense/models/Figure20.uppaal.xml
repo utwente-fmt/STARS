@@ -1,0 +1,218 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<nta>
+  <declaration>// Global Clock
+clock global;
+
+// # of Processors
+const int N = 2;
+// # of Actors   
+const int M = 4;
+
+// Task and Processors IDs
+typedef int[0,N-1] id_r;
+
+// Channels
+chan end[N][M], fire[N][M];
+
+// Buffer and Edge Sizes
+int buff_OUT2AEC = 2;
+int buff_AEC2OUT = 0;
+int buff_AEC2ADC = 2;
+int buff_ADC2AEC = 0;
+int buff_AEC2SRC = 2;
+int buff_SRC2AEC = 0;
+
+// Flag to check if SDFG has started
+bool flag_act=true;
+
+// Counter for each actor
+int counter_out = 0;
+int counter_aec = 0;
+int counter_adc = 0;
+int counter_src = 0;
+
+void produce(int &amp;channel_tokens, int tokens) {
+    channel_tokens+=tokens;
+}
+
+void consume(int &amp;channel_tokens, int tokens) {
+    channel_tokens-=tokens;
+}
+</declaration>
+  <template>
+    <name>P_p1</name>
+    <parameter>const int p_id, const int out, const int aec, const int adc, const int src</parameter>
+    <declaration>clock x;</declaration>
+    <location id="Idle">
+      <name>Idle</name>
+    </location>
+    <location id="OUT">
+      <name>InUse_out</name>
+      <label kind="invariant">x &lt;= 1</label>
+    </location>
+    <location id="AEC">
+      <name>InUse_aec</name>
+      <label kind="invariant">x &lt;= 1</label>
+    </location>
+    <location id="ADC">
+      <name>InUse_adc</name>
+      <label kind="invariant">x &lt;= 1</label>
+    </location>
+    <location id="SRC">
+      <name>InUse_src</name>
+      <label kind="invariant">x &lt;= 1</label>
+    </location>
+    <init ref="Idle"/>
+    <transition>
+      <source ref="Idle"/>
+      <target ref="OUT"/>
+      <label kind="synchronisation">fire[p_id][out]?</label>
+      <label kind="assignment">x := 0</label>
+    </transition>
+    <transition>
+      <source ref="OUT"/>
+      <target ref="Idle"/>
+      <label kind="synchronisation">end[p_id][out]!</label>
+      <label kind="guard">x == 1</label>
+    </transition>
+    <transition>
+      <source ref="Idle"/>
+      <target ref="AEC"/>
+      <label kind="synchronisation">fire[p_id][aec]?</label>
+      <label kind="assignment">x := 0</label>
+    </transition>
+    <transition>
+      <source ref="AEC"/>
+      <target ref="Idle"/>
+      <label kind="synchronisation">end[p_id][aec]!</label>
+      <label kind="guard">x == 1</label>
+    </transition>
+    <transition>
+      <source ref="Idle"/>
+      <target ref="ADC"/>
+      <label kind="synchronisation">fire[p_id][adc]?</label>
+      <label kind="assignment">x := 0</label>
+    </transition>
+    <transition>
+      <source ref="ADC"/>
+      <target ref="Idle"/>
+      <label kind="synchronisation">end[p_id][adc]!</label>
+      <label kind="guard">x == 1</label>
+    </transition>
+    <transition>
+      <source ref="Idle"/>
+      <target ref="SRC"/>
+      <label kind="synchronisation">fire[p_id][src]?</label>
+      <label kind="assignment">x := 0</label>
+    </transition>
+    <transition>
+      <source ref="SRC"/>
+      <target ref="Idle"/>
+      <label kind="synchronisation">end[p_id][src]!</label>
+      <label kind="guard">x == 1</label>
+    </transition>
+  </template>
+  <template>
+    <name>SDFG</name>
+    <parameter>const int out, const int aec, const int adc, const int src</parameter>
+    <location id="Initial">
+      <name>Initial</name>
+    </location>
+    <init ref="Initial"/>
+    <transition>
+      <source ref="Initial"/>
+      <target ref="Initial"/>
+      <label kind="select">e:id_r</label>
+      <label kind="synchronisation">fire[e][out]!</label>
+      <label kind="guard">buff_AEC2OUT>=2</label>
+      <label kind="assignment">consume(buff_AEC2OUT, 2)</label>
+    </transition>
+    <transition>
+      <source ref="Initial"/>
+      <target ref="Initial"/>
+      <label kind="select">e:id_r</label>
+      <label kind="synchronisation">end[e][out]?</label>
+      <label kind="assignment">produce(buff_OUT2AEC, 2),
+flag_act := false,
+counter_out++</label>
+      <label kind="comments">Fire_OUT</label>
+    </transition>
+    <transition>
+      <source ref="Initial"/>
+      <target ref="Initial"/>
+      <label kind="select">e:id_r</label>
+      <label kind="synchronisation">fire[e][aec]!</label>
+      <label kind="guard">buff_OUT2AEC>=1 &amp; buff_ADC2AEC>=1 &amp; buff_SRC2AEC>=1</label>
+      <label kind="assignment">consume(buff_OUT2AEC, 1),
+consume(buff_ADC2AEC, 1),
+consume(buff_SRC2AEC, 1)</label>
+    </transition>
+    <transition>
+      <source ref="Initial"/>
+      <target ref="Initial"/>
+      <label kind="select">e:id_r</label>
+      <label kind="synchronisation">end[e][aec]?</label>
+      <label kind="assignment">produce(buff_AEC2OUT, 1),
+produce(buff_AEC2ADC, 1),
+produce(buff_AEC2SRC, 1),
+flag_act := false,
+counter_aec++</label>
+      <label kind="comments">Fire_AEC</label>
+    </transition>
+    <transition>
+      <source ref="Initial"/>
+      <target ref="Initial"/>
+      <label kind="select">e:id_r</label>
+      <label kind="synchronisation">fire[e][adc]!</label>
+      <label kind="guard">buff_AEC2ADC>=2</label>
+      <label kind="assignment">consume(buff_AEC2ADC, 2)</label>
+    </transition>
+    <transition>
+      <source ref="Initial"/>
+      <target ref="Initial"/>
+      <label kind="select">e:id_r</label>
+      <label kind="synchronisation">end[e][adc]?</label>
+      <label kind="assignment">produce(buff_ADC2AEC, 2),
+flag_act := false,
+counter_adc++</label>
+      <label kind="comments">Fire_ADC</label>
+    </transition>
+    <transition>
+      <source ref="Initial"/>
+      <target ref="Initial"/>
+      <label kind="select">e:id_r</label>
+      <label kind="synchronisation">fire[e][src]!</label>
+      <label kind="guard">buff_AEC2SRC>=2</label>
+      <label kind="assignment">consume(buff_AEC2SRC, 2)</label>
+    </transition>
+    <transition>
+      <source ref="Initial"/>
+      <target ref="Initial"/>
+      <label kind="select">e:id_r</label>
+      <label kind="synchronisation">end[e][src]?</label>
+      <label kind="assignment">produce(buff_SRC2AEC, 2),
+flag_act := false,
+counter_src++</label>
+      <label kind="comments">Fire_SRC</label>
+    </transition>
+  </template>
+  <system>// Actors
+const int out = 0;
+const int aec = 1;
+const int adc = 2;
+const int src = 3;
+
+// Templace instances
+const int p1_0 = 0;
+P_p1_0 = P_p1(p1_0, out, aec, adc, src);
+
+const int p1_1 = 1;
+P_p1_1 = P_p1(p1_1, out, aec, adc, src);
+
+SDF_Graph = SDFG(out, aec, adc, src);
+
+
+// System instantiation
+system SDF_Graph, P_p1_0, P_p1_1;
+</system>
+</nta>

@@ -1,0 +1,644 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<nta>
+  <declaration>urgent chan hurry;
+
+const int NUM_OF_MESSAGES = 5;
+
+typedef int [0, NUM_OF_MESSAGES] Message;
+
+const Message null = 0, accept = 1, decline = 2, finish = 3, laneChanged = 4, request = 5;
+
+const int CAPACITY = 5;
+
+typedef struct {
+  int [0, CAPACITY] tail;
+  Message messages[CAPACITY];
+} Buffer;
+
+bool check(Buffer buffer, Message m) {
+    return m != null and buffer.messages[0] == m;
+}
+
+
+void remove(Buffer&amp; buffer, Message m) {
+    if (check(buffer, m)) {
+        int i;
+        
+        for (i = 0; i &lt; CAPACITY - 1; i++)
+            buffer.messages[i] = buffer.messages[i + 1];
+        buffer.messages[CAPACITY - 1] = null;
+        buffer.tail--;
+    }
+}
+
+
+void add(Buffer&amp; b, Message e) {
+    b.messages[b.tail] = e;
+    b.tail++;
+}
+
+
+const int NUM_OF_INSTANCES = 2;
+
+typedef int [0, NUM_OF_INSTANCES - 1] instance;
+
+bool overflow;
+
+Buffer buffers[instance];
+
+Buffer connectors[instance];
+
+int earliest[instance];
+
+int latest[instance];
+
+clock transmissionTimes[instance][CAPACITY];
+
+void send(instance sender, Message m) {
+    if (connectors[sender].tail &lt; CAPACITY) {
+        add(connectors[sender], m);
+        transmissionTimes[sender][latest[sender]] = 0;
+        latest[sender] == CAPACITY - 1 ? (latest[sender] = 0) : latest[sender]++;
+    }
+    else
+        overflow = true;
+}
+
+
+bool receive(instance receiver, Message m) {
+    return check(buffers[receiver], m);
+}
+
+
+void consume(instance receiver, Message m) {
+    if (receive(receiver, m))
+        remove(buffers[receiver], m);
+}
+
+
+typedef int [0, 0] rear_RANGE;
+
+int trigger4[rear_RANGE] = { 0 };
+
+int trigger5[rear_RANGE] = { 0 };
+
+int trigger6[rear_RANGE] = { 1 };
+
+int trigger7[rear_RANGE] = { 0 };
+
+clock c1[rear_RANGE];
+
+clock RELATIVE[rear_RANGE];
+
+urgent chan exit_overtaking[rear_RANGE];
+
+urgent chan enter_overtaking_in_rear_via_overtaking_ENTRY[rear_RANGE];
+
+urgent chan exit_noOvertaking0[rear_RANGE];
+
+urgent chan enter_noOvertaking_in_rear_via_noOvertaking_ENTRY0[rear_RANGE];
+
+urgent chan enter_noOvertaking_in_rear_via_noOvertaking_ENTRY1[rear_RANGE];
+
+typedef int [1, 1] front_RANGE;
+
+int trigger[front_RANGE] = { 0 };
+
+int trigger0[front_RANGE] = { 0 };
+
+int trigger1[front_RANGE] = { 0 };
+
+int trigger2[front_RANGE] = { 0 };
+
+int trigger3[front_RANGE] = { 0 };
+
+clock c2[front_RANGE];
+
+urgent chan exit_noAcceleration[front_RANGE];
+
+urgent chan enter_noAcceleration_in_front_via_noAcceleration_ENTRY2[front_RANGE];
+
+urgent chan exit_noOvertaking[front_RANGE];
+
+urgent chan enter_noOvertaking_in_front_via_entry[front_RANGE];
+
+urgent chan enter_noOvertaking_in_front_via_noOvertaking_ENTRY3[front_RANGE];
+
+</declaration>
+  <template>
+    <name>Connector</name>
+    <parameter>instance sender, instance receiver, int min, int max, bool loss, int bufferSize</parameter>
+    <declaration>Message tmp;
+
+</declaration>
+    <location color="Default" id="Idle_Connector">
+      <name>Idle</name>
+      <label kind="invariant">connectors[sender].tail > 0 imply transmissionTimes[sender][earliest[sender]] &lt;= max</label>
+    </location>
+    <location color="Default" id="transfer_loc_Connector">
+      <name>transfer_loc</name>
+      <committed></committed>
+    </location>
+    <init ref="Idle_Connector"/>
+    <transition>
+      <source ref="Idle_Connector"/>
+      <target ref="transfer_loc_Connector"/>
+      <label kind="guard">check(connectors[sender], i) and transmissionTimes[sender][earliest[sender]] >= min and transmissionTimes[sender][earliest[sender]] &lt;= max</label>
+      <label kind="select">i : Message</label>
+      <label kind="assignment">tmp = i,
+remove(connectors[sender], i),
+earliest[sender] == CAPACITY - 1 ? (earliest[sender] = 0) : earliest[sender]++</label>
+    </transition>
+    <transition>
+      <source ref="transfer_loc_Connector"/>
+      <target ref="Idle_Connector"/>
+      <label kind="guard">buffers[receiver].tail &lt; bufferSize</label>
+      <label kind="assignment">add(buffers[receiver], tmp)</label>
+    </transition>
+    <transition>
+      <source ref="transfer_loc_Connector"/>
+      <target ref="Idle_Connector"/>
+      <label kind="guard">buffers[receiver].tail >= bufferSize</label>
+      <label kind="assignment">overflow = true</label>
+    </transition>
+    <transition>
+      <source ref="transfer_loc_Connector"/>
+      <target ref="Idle_Connector"/>
+      <label kind="guard">loss == true</label>
+    </transition>
+  </template>
+  <template>
+    <name>rear</name>
+    <parameter>rear_RANGE portOrRoleInstanceID</parameter>
+    <location color="Default" id="rear_IDLE_rear">
+      <name>rear_IDLE</name>
+    </location>
+    <location color="Default" id="overtaking_ACTIVE_IN_rear_rear">
+      <name>overtaking_ACTIVE_IN_rear</name>
+      <label kind="invariant">c1[portOrRoleInstanceID] &lt;= 10</label>
+    </location>
+    <location color="Default" id="noOvertaking_ACTIVE_IN_rear_rear">
+      <name>noOvertaking_ACTIVE_IN_rear</name>
+    </location>
+    <location color="Default" id="rear_AUX_overtaking_overtaking_ENTRY_rear">
+      <name>rear_AUX_overtaking_overtaking_ENTRY</name>
+      <committed></committed>
+    </location>
+    <location color="Default" id="rear_AUX_noOvertaking_noOvertaking_ENTRY0_rear">
+      <name>rear_AUX_noOvertaking_noOvertaking_ENTRY0</name>
+      <committed></committed>
+    </location>
+    <location color="Default" id="rear_AUX_noOvertaking_noOvertaking_ENTRY1_rear">
+      <name>rear_AUX_noOvertaking_noOvertaking_ENTRY1</name>
+      <committed></committed>
+    </location>
+    <location color="Default" id="exit4_rear">
+      <name>exit4</name>
+      <committed></committed>
+    </location>
+    <location color="Default" id="exit5_rear">
+      <name>exit5</name>
+      <committed></committed>
+    </location>
+    <location color="Default" id="noOvertaking_EXIT6_rear">
+      <name>noOvertaking_EXIT6</name>
+      <committed></committed>
+    </location>
+    <location color="Default" id="noOvertaking_EXIT7_rear">
+      <name>noOvertaking_EXIT7</name>
+      <committed></committed>
+    </location>
+    <init ref="noOvertaking_ACTIVE_IN_rear_rear"/>
+    <transition>
+      <source ref="rear_AUX_overtaking_overtaking_ENTRY_rear"/>
+      <target ref="overtaking_ACTIVE_IN_rear_rear"/>
+      <label kind="synchronisation">enter_overtaking_in_rear_via_overtaking_ENTRY[portOrRoleInstanceID]!</label>
+    </transition>
+    <transition>
+      <source ref="overtaking_ACTIVE_IN_rear_rear"/>
+      <target ref="exit4_rear"/>
+      <label kind="guard">trigger4[portOrRoleInstanceID] == 1</label>
+    </transition>
+    <transition>
+      <source ref="rear_AUX_noOvertaking_noOvertaking_ENTRY0_rear"/>
+      <target ref="noOvertaking_ACTIVE_IN_rear_rear"/>
+      <label kind="synchronisation">enter_noOvertaking_in_rear_via_noOvertaking_ENTRY0[portOrRoleInstanceID]!</label>
+    </transition>
+    <transition>
+      <source ref="rear_AUX_noOvertaking_noOvertaking_ENTRY1_rear"/>
+      <target ref="noOvertaking_ACTIVE_IN_rear_rear"/>
+      <label kind="synchronisation">enter_noOvertaking_in_rear_via_noOvertaking_ENTRY1[portOrRoleInstanceID]!</label>
+    </transition>
+    <transition>
+      <source ref="noOvertaking_ACTIVE_IN_rear_rear"/>
+      <target ref="exit5_rear"/>
+      <label kind="guard">trigger5[portOrRoleInstanceID] == 1 and receive(portOrRoleInstanceID, accept)</label>
+      <label kind="synchronisation">hurry?</label>
+      <label kind="assignment">consume(portOrRoleInstanceID, accept)</label>
+    </transition>
+    <transition>
+      <source ref="noOvertaking_ACTIVE_IN_rear_rear"/>
+      <target ref="noOvertaking_EXIT6_rear"/>
+      <label kind="guard">trigger6[portOrRoleInstanceID] == 1 and receive(portOrRoleInstanceID, decline)</label>
+      <label kind="synchronisation">hurry?</label>
+      <label kind="assignment">consume(portOrRoleInstanceID, decline)</label>
+    </transition>
+    <transition>
+      <source ref="noOvertaking_ACTIVE_IN_rear_rear"/>
+      <target ref="noOvertaking_EXIT7_rear"/>
+      <label kind="guard">trigger7[portOrRoleInstanceID] == 1 and receive(portOrRoleInstanceID, decline)</label>
+      <label kind="synchronisation">hurry?</label>
+      <label kind="assignment">consume(portOrRoleInstanceID, decline)</label>
+    </transition>
+    <transition>
+      <source ref="exit5_rear"/>
+      <target ref="rear_AUX_overtaking_overtaking_ENTRY_rear"/>
+      <label kind="synchronisation">exit_noOvertaking0[portOrRoleInstanceID]!</label>
+      <label kind="assignment">c1[portOrRoleInstanceID] = 0</label>
+    </transition>
+    <transition>
+      <source ref="noOvertaking_EXIT6_rear"/>
+      <target ref="rear_AUX_noOvertaking_noOvertaking_ENTRY0_rear"/>
+      <label kind="synchronisation">exit_noOvertaking0[portOrRoleInstanceID]!</label>
+    </transition>
+    <transition>
+      <source ref="noOvertaking_EXIT7_rear"/>
+      <target ref="rear_AUX_noOvertaking_noOvertaking_ENTRY0_rear"/>
+      <label kind="synchronisation">exit_noOvertaking0[portOrRoleInstanceID]!</label>
+    </transition>
+    <transition>
+      <source ref="exit4_rear"/>
+      <target ref="rear_AUX_noOvertaking_noOvertaking_ENTRY1_rear"/>
+      <label kind="synchronisation">exit_overtaking[portOrRoleInstanceID]!</label>
+    </transition>
+  </template>
+  <template>
+    <name>rear_overtaking</name>
+    <parameter>rear_RANGE portOrRoleInstanceID</parameter>
+    <location color="Default" id="rear_overtaking_IDLE_rear_overtaking">
+      <name>rear_overtaking_IDLE</name>
+    </location>
+    <location color="Default" id="init_ACTIVE_IN_rear_overtaking_rear_overtaking">
+      <name>init_ACTIVE_IN_rear_overtaking</name>
+    </location>
+    <location color="Default" id="changed_ACTIVE_IN_rear_overtaking_rear_overtaking">
+      <name>changed_ACTIVE_IN_rear_overtaking</name>
+    </location>
+    <location color="Default" id="INTERMEDIATE_ACTIVE_IN_rear_overtaking_rear_overtaking">
+      <name>INTERMEDIATE_ACTIVE_IN_rear_overtaking</name>
+      <label kind="invariant">RELATIVE[portOrRoleInstanceID] &lt;= 5</label>
+    </location>
+    <init ref="rear_overtaking_IDLE_rear_overtaking"/>
+    <transition>
+      <source ref="changed_ACTIVE_IN_rear_overtaking_rear_overtaking"/>
+      <target ref="rear_overtaking_IDLE_rear_overtaking"/>
+      <label kind="synchronisation">exit_overtaking[portOrRoleInstanceID]?</label>
+      <label kind="assignment">trigger4[portOrRoleInstanceID] -= 1</label>
+    </transition>
+    <transition>
+      <source ref="rear_overtaking_IDLE_rear_overtaking"/>
+      <target ref="init_ACTIVE_IN_rear_overtaking_rear_overtaking"/>
+      <label kind="synchronisation">enter_overtaking_in_rear_via_overtaking_ENTRY[portOrRoleInstanceID]?</label>
+      <label kind="assignment">c1[portOrRoleInstanceID] = 0,
+RELATIVE[portOrRoleInstanceID] = 0</label>
+    </transition>
+    <transition>
+      <source ref="init_ACTIVE_IN_rear_overtaking_rear_overtaking"/>
+      <target ref="INTERMEDIATE_ACTIVE_IN_rear_overtaking_rear_overtaking"/>
+      <label kind="synchronisation">hurry?</label>
+      <label kind="assignment">RELATIVE[portOrRoleInstanceID] = 0</label>
+    </transition>
+    <transition>
+      <source ref="INTERMEDIATE_ACTIVE_IN_rear_overtaking_rear_overtaking"/>
+      <target ref="changed_ACTIVE_IN_rear_overtaking_rear_overtaking"/>
+      <label kind="guard">RELATIVE[portOrRoleInstanceID] >= 5</label>
+      <label kind="assignment">trigger4[portOrRoleInstanceID] += 1,
+send(portOrRoleInstanceID, laneChanged)</label>
+    </transition>
+  </template>
+  <template>
+    <name>rear_noOvertaking</name>
+    <parameter>rear_RANGE portOrRoleInstanceID</parameter>
+    <location color="Default" id="rear_noOvertaking_IDLE_rear_noOvertaking">
+      <name>rear_noOvertaking_IDLE</name>
+    </location>
+    <location color="Default" id="init_ACTIVE_IN_rear_noOvertaking_rear_noOvertaking">
+      <name>init_ACTIVE_IN_rear_noOvertaking</name>
+    </location>
+    <location color="Default" id="requested_ACTIVE_IN_rear_noOvertaking_rear_noOvertaking">
+      <name>requested_ACTIVE_IN_rear_noOvertaking</name>
+      <label kind="invariant">c1[portOrRoleInstanceID] &lt;= 6</label>
+    </location>
+    <init ref="init_ACTIVE_IN_rear_noOvertaking_rear_noOvertaking"/>
+    <transition>
+      <source ref="init_ACTIVE_IN_rear_noOvertaking_rear_noOvertaking"/>
+      <target ref="rear_noOvertaking_IDLE_rear_noOvertaking"/>
+      <label kind="synchronisation">exit_noOvertaking0[portOrRoleInstanceID]?</label>
+      <label kind="assignment">trigger6[portOrRoleInstanceID] -= 1</label>
+    </transition>
+    <transition>
+      <source ref="requested_ACTIVE_IN_rear_noOvertaking_rear_noOvertaking"/>
+      <target ref="rear_noOvertaking_IDLE_rear_noOvertaking"/>
+      <label kind="synchronisation">exit_noOvertaking0[portOrRoleInstanceID]?</label>
+      <label kind="assignment">trigger5[portOrRoleInstanceID] -= 1,
+trigger7[portOrRoleInstanceID] -= 1</label>
+    </transition>
+    <transition>
+      <source ref="requested_ACTIVE_IN_rear_noOvertaking_rear_noOvertaking"/>
+      <target ref="rear_noOvertaking_IDLE_rear_noOvertaking"/>
+      <label kind="synchronisation">exit_noOvertaking0[portOrRoleInstanceID]?</label>
+      <label kind="assignment">trigger5[portOrRoleInstanceID] -= 1,
+trigger7[portOrRoleInstanceID] -= 1</label>
+    </transition>
+    <transition>
+      <source ref="rear_noOvertaking_IDLE_rear_noOvertaking"/>
+      <target ref="init_ACTIVE_IN_rear_noOvertaking_rear_noOvertaking"/>
+      <label kind="synchronisation">enter_noOvertaking_in_rear_via_noOvertaking_ENTRY0[portOrRoleInstanceID]?</label>
+      <label kind="assignment">trigger6[portOrRoleInstanceID] += 1</label>
+    </transition>
+    <transition>
+      <source ref="rear_noOvertaking_IDLE_rear_noOvertaking"/>
+      <target ref="init_ACTIVE_IN_rear_noOvertaking_rear_noOvertaking"/>
+      <label kind="synchronisation">enter_noOvertaking_in_rear_via_noOvertaking_ENTRY1[portOrRoleInstanceID]?</label>
+      <label kind="assignment">trigger6[portOrRoleInstanceID] += 1,
+send(portOrRoleInstanceID, finish)</label>
+    </transition>
+    <transition>
+      <source ref="requested_ACTIVE_IN_rear_noOvertaking_rear_noOvertaking"/>
+      <target ref="init_ACTIVE_IN_rear_noOvertaking_rear_noOvertaking"/>
+      <label kind="guard">c1[portOrRoleInstanceID] >= 6</label>
+      <label kind="assignment">trigger5[portOrRoleInstanceID] -= 1,
+trigger6[portOrRoleInstanceID] += 1,
+trigger7[portOrRoleInstanceID] -= 1</label>
+    </transition>
+    <transition>
+      <source ref="init_ACTIVE_IN_rear_noOvertaking_rear_noOvertaking"/>
+      <target ref="requested_ACTIVE_IN_rear_noOvertaking_rear_noOvertaking"/>
+      <label kind="assignment">c1[portOrRoleInstanceID] = 0,
+trigger5[portOrRoleInstanceID] += 1,
+trigger6[portOrRoleInstanceID] -= 1,
+trigger7[portOrRoleInstanceID] += 1,
+send(portOrRoleInstanceID, request)</label>
+    </transition>
+  </template>
+  <template>
+    <name>front</name>
+    <parameter>front_RANGE portOrRoleInstanceID</parameter>
+    <location color="Default" id="front_IDLE_front">
+      <name>front_IDLE</name>
+    </location>
+    <location color="Default" id="noAcceleration_ACTIVE_IN_front_front">
+      <name>noAcceleration_ACTIVE_IN_front</name>
+    </location>
+    <location color="Default" id="noOvertaking_ACTIVE_IN_front_front">
+      <name>noOvertaking_ACTIVE_IN_front</name>
+    </location>
+    <location color="Default" id="front_AUX_noAcceleration_noAcceleration_ENTRY2_front">
+      <name>front_AUX_noAcceleration_noAcceleration_ENTRY2</name>
+      <committed></committed>
+    </location>
+    <location color="Default" id="front_AUX_noOvertaking_entry_front">
+      <name>front_AUX_noOvertaking_entry</name>
+      <committed></committed>
+    </location>
+    <location color="Default" id="front_AUX_noOvertaking_noOvertaking_ENTRY3_front">
+      <name>front_AUX_noOvertaking_noOvertaking_ENTRY3</name>
+      <committed></committed>
+    </location>
+    <location color="Default" id="noAcceleration_EXIT0_front">
+      <name>noAcceleration_EXIT0</name>
+      <committed></committed>
+    </location>
+    <location color="Default" id="noAcceleration_EXIT00_front">
+      <name>noAcceleration_EXIT00</name>
+      <committed></committed>
+    </location>
+    <location color="Default" id="noAcceleration_EXIT11_front">
+      <name>noAcceleration_EXIT11</name>
+      <committed></committed>
+    </location>
+    <location color="Default" id="noAcceleration_EXIT12_front">
+      <name>noAcceleration_EXIT12</name>
+      <committed></committed>
+    </location>
+    <location color="Default" id="exit3_front">
+      <name>exit3</name>
+      <committed></committed>
+    </location>
+    <init ref="noOvertaking_ACTIVE_IN_front_front"/>
+    <transition>
+      <source ref="front_AUX_noAcceleration_noAcceleration_ENTRY2_front"/>
+      <target ref="noAcceleration_ACTIVE_IN_front_front"/>
+      <label kind="synchronisation">enter_noAcceleration_in_front_via_noAcceleration_ENTRY2[portOrRoleInstanceID]!</label>
+    </transition>
+    <transition>
+      <source ref="noAcceleration_ACTIVE_IN_front_front"/>
+      <target ref="noAcceleration_EXIT0_front"/>
+      <label kind="guard">trigger[portOrRoleInstanceID] == 1 and receive(portOrRoleInstanceID, finish)</label>
+      <label kind="synchronisation">hurry?</label>
+      <label kind="assignment">consume(portOrRoleInstanceID, finish)</label>
+    </transition>
+    <transition>
+      <source ref="noAcceleration_ACTIVE_IN_front_front"/>
+      <target ref="noAcceleration_EXIT00_front"/>
+      <label kind="guard">trigger0[portOrRoleInstanceID] == 1 and receive(portOrRoleInstanceID, finish)</label>
+      <label kind="synchronisation">hurry?</label>
+      <label kind="assignment">consume(portOrRoleInstanceID, finish)</label>
+    </transition>
+    <transition>
+      <source ref="noAcceleration_ACTIVE_IN_front_front"/>
+      <target ref="noAcceleration_EXIT11_front"/>
+      <label kind="guard">trigger1[portOrRoleInstanceID] == 1 and receive(portOrRoleInstanceID, request)</label>
+      <label kind="synchronisation">hurry?</label>
+      <label kind="assignment">consume(portOrRoleInstanceID, request)</label>
+    </transition>
+    <transition>
+      <source ref="noAcceleration_ACTIVE_IN_front_front"/>
+      <target ref="noAcceleration_EXIT12_front"/>
+      <label kind="guard">trigger2[portOrRoleInstanceID] == 1 and receive(portOrRoleInstanceID, request)</label>
+      <label kind="synchronisation">hurry?</label>
+      <label kind="assignment">consume(portOrRoleInstanceID, request)</label>
+    </transition>
+    <transition>
+      <source ref="front_AUX_noOvertaking_entry_front"/>
+      <target ref="noOvertaking_ACTIVE_IN_front_front"/>
+      <label kind="synchronisation">enter_noOvertaking_in_front_via_entry[portOrRoleInstanceID]!</label>
+    </transition>
+    <transition>
+      <source ref="front_AUX_noOvertaking_noOvertaking_ENTRY3_front"/>
+      <target ref="noOvertaking_ACTIVE_IN_front_front"/>
+      <label kind="synchronisation">enter_noOvertaking_in_front_via_noOvertaking_ENTRY3[portOrRoleInstanceID]!</label>
+    </transition>
+    <transition>
+      <source ref="noOvertaking_ACTIVE_IN_front_front"/>
+      <target ref="exit3_front"/>
+      <label kind="guard">trigger3[portOrRoleInstanceID] == 1</label>
+    </transition>
+    <transition>
+      <source ref="exit3_front"/>
+      <target ref="front_AUX_noAcceleration_noAcceleration_ENTRY2_front"/>
+      <label kind="synchronisation">exit_noOvertaking[portOrRoleInstanceID]!</label>
+    </transition>
+    <transition>
+      <source ref="noAcceleration_EXIT11_front"/>
+      <target ref="front_AUX_noOvertaking_entry_front"/>
+      <label kind="synchronisation">exit_noAcceleration[portOrRoleInstanceID]!</label>
+    </transition>
+    <transition>
+      <source ref="noAcceleration_EXIT12_front"/>
+      <target ref="front_AUX_noOvertaking_entry_front"/>
+      <label kind="synchronisation">exit_noAcceleration[portOrRoleInstanceID]!</label>
+    </transition>
+    <transition>
+      <source ref="noAcceleration_EXIT0_front"/>
+      <target ref="front_AUX_noOvertaking_noOvertaking_ENTRY3_front"/>
+      <label kind="synchronisation">exit_noAcceleration[portOrRoleInstanceID]!</label>
+    </transition>
+    <transition>
+      <source ref="noAcceleration_EXIT00_front"/>
+      <target ref="front_AUX_noOvertaking_noOvertaking_ENTRY3_front"/>
+      <label kind="synchronisation">exit_noAcceleration[portOrRoleInstanceID]!</label>
+    </transition>
+  </template>
+  <template>
+    <name>front_noAcceleration</name>
+    <parameter>front_RANGE portOrRoleInstanceID</parameter>
+    <location color="Default" id="front_noAcceleration_IDLE_front_noAcceleration">
+      <name>front_noAcceleration_IDLE</name>
+    </location>
+    <location color="Default" id="noBraking_ACTIVE_IN_front_noAcceleration_front_noAcceleration">
+      <name>noBraking_ACTIVE_IN_front_noAcceleration</name>
+    </location>
+    <location color="Default" id="brakingAllowed_ACTIVE_IN_front_noAcceleration_front_noAcceleration">
+      <name>brakingAllowed_ACTIVE_IN_front_noAcceleration</name>
+    </location>
+    <init ref="front_noAcceleration_IDLE_front_noAcceleration"/>
+    <transition>
+      <source ref="noBraking_ACTIVE_IN_front_noAcceleration_front_noAcceleration"/>
+      <target ref="front_noAcceleration_IDLE_front_noAcceleration"/>
+      <label kind="synchronisation">exit_noAcceleration[portOrRoleInstanceID]?</label>
+      <label kind="assignment">trigger[portOrRoleInstanceID] -= 1,
+trigger1[portOrRoleInstanceID] -= 1</label>
+    </transition>
+    <transition>
+      <source ref="noBraking_ACTIVE_IN_front_noAcceleration_front_noAcceleration"/>
+      <target ref="front_noAcceleration_IDLE_front_noAcceleration"/>
+      <label kind="synchronisation">exit_noAcceleration[portOrRoleInstanceID]?</label>
+      <label kind="assignment">trigger[portOrRoleInstanceID] -= 1,
+trigger1[portOrRoleInstanceID] -= 1</label>
+    </transition>
+    <transition>
+      <source ref="brakingAllowed_ACTIVE_IN_front_noAcceleration_front_noAcceleration"/>
+      <target ref="front_noAcceleration_IDLE_front_noAcceleration"/>
+      <label kind="synchronisation">exit_noAcceleration[portOrRoleInstanceID]?</label>
+      <label kind="assignment">trigger0[portOrRoleInstanceID] -= 1,
+trigger2[portOrRoleInstanceID] -= 1</label>
+    </transition>
+    <transition>
+      <source ref="brakingAllowed_ACTIVE_IN_front_noAcceleration_front_noAcceleration"/>
+      <target ref="front_noAcceleration_IDLE_front_noAcceleration"/>
+      <label kind="synchronisation">exit_noAcceleration[portOrRoleInstanceID]?</label>
+      <label kind="assignment">trigger0[portOrRoleInstanceID] -= 1,
+trigger2[portOrRoleInstanceID] -= 1</label>
+    </transition>
+    <transition>
+      <source ref="front_noAcceleration_IDLE_front_noAcceleration"/>
+      <target ref="noBraking_ACTIVE_IN_front_noAcceleration_front_noAcceleration"/>
+      <label kind="synchronisation">enter_noAcceleration_in_front_via_noAcceleration_ENTRY2[portOrRoleInstanceID]?</label>
+      <label kind="assignment">trigger[portOrRoleInstanceID] += 1,
+trigger1[portOrRoleInstanceID] += 1,
+send(portOrRoleInstanceID, accept)</label>
+    </transition>
+    <transition>
+      <source ref="noBraking_ACTIVE_IN_front_noAcceleration_front_noAcceleration"/>
+      <target ref="brakingAllowed_ACTIVE_IN_front_noAcceleration_front_noAcceleration"/>
+      <label kind="guard">receive(portOrRoleInstanceID, laneChanged)</label>
+      <label kind="synchronisation">hurry?</label>
+      <label kind="assignment">consume(portOrRoleInstanceID, laneChanged),
+trigger[portOrRoleInstanceID] -= 1,
+trigger0[portOrRoleInstanceID] += 1,
+trigger1[portOrRoleInstanceID] -= 1,
+trigger2[portOrRoleInstanceID] += 1</label>
+    </transition>
+  </template>
+  <template>
+    <name>front_noOvertaking</name>
+    <parameter>front_RANGE portOrRoleInstanceID</parameter>
+    <location color="Default" id="front_noOvertaking_IDLE_front_noOvertaking">
+      <name>front_noOvertaking_IDLE</name>
+    </location>
+    <location color="Default" id="init_ACTIVE_IN_front_noOvertaking_front_noOvertaking">
+      <name>init_ACTIVE_IN_front_noOvertaking</name>
+    </location>
+    <location color="Default" id="received_ACTIVE_IN_front_noOvertaking_front_noOvertaking">
+      <name>received_ACTIVE_IN_front_noOvertaking</name>
+      <label kind="invariant">c2[portOrRoleInstanceID] &lt;= 3</label>
+    </location>
+    <init ref="init_ACTIVE_IN_front_noOvertaking_front_noOvertaking"/>
+    <transition>
+      <source ref="received_ACTIVE_IN_front_noOvertaking_front_noOvertaking"/>
+      <target ref="front_noOvertaking_IDLE_front_noOvertaking"/>
+      <label kind="synchronisation">exit_noOvertaking[portOrRoleInstanceID]?</label>
+      <label kind="assignment">trigger3[portOrRoleInstanceID] -= 1</label>
+    </transition>
+    <transition>
+      <source ref="front_noOvertaking_IDLE_front_noOvertaking"/>
+      <target ref="received_ACTIVE_IN_front_noOvertaking_front_noOvertaking"/>
+      <label kind="synchronisation">enter_noOvertaking_in_front_via_entry[portOrRoleInstanceID]?</label>
+      <label kind="assignment">c2[portOrRoleInstanceID] = 0,
+trigger3[portOrRoleInstanceID] += 1</label>
+    </transition>
+    <transition>
+      <source ref="front_noOvertaking_IDLE_front_noOvertaking"/>
+      <target ref="init_ACTIVE_IN_front_noOvertaking_front_noOvertaking"/>
+      <label kind="synchronisation">enter_noOvertaking_in_front_via_noOvertaking_ENTRY3[portOrRoleInstanceID]?</label>
+      <label kind="assignment">c2[portOrRoleInstanceID] = 0</label>
+    </transition>
+    <transition>
+      <source ref="received_ACTIVE_IN_front_noOvertaking_front_noOvertaking"/>
+      <target ref="init_ACTIVE_IN_front_noOvertaking_front_noOvertaking"/>
+      <label kind="assignment">trigger3[portOrRoleInstanceID] -= 1,
+send(portOrRoleInstanceID, decline)</label>
+    </transition>
+    <transition>
+      <source ref="init_ACTIVE_IN_front_noOvertaking_front_noOvertaking"/>
+      <target ref="received_ACTIVE_IN_front_noOvertaking_front_noOvertaking"/>
+      <label kind="guard">receive(portOrRoleInstanceID, request)</label>
+      <label kind="synchronisation">hurry?</label>
+      <label kind="assignment">consume(portOrRoleInstanceID, request),
+c2[portOrRoleInstanceID] = 0,
+trigger3[portOrRoleInstanceID] += 1</label>
+    </transition>
+  </template>
+  <template>
+    <name>UrgencyProvider</name>
+    <parameter></parameter>
+    <location color="Default" id="idle_UrgencyProvider">
+      <name>idle</name>
+    </location>
+    <init ref="idle_UrgencyProvider"/>
+    <transition>
+      <source ref="idle_UrgencyProvider"/>
+      <target ref="idle_UrgencyProvider"/>
+      <label kind="synchronisation">hurry!</label>
+    </transition>
+  </template>
+  <system>rear_0 = rear(0);
+
+rear_overtaking_0 = rear_overtaking(0);
+
+rear_noOvertaking_0 = rear_noOvertaking(0);
+
+front_1 = front(1);
+
+front_noAcceleration_1 = front_noAcceleration(1);
+
+front_noOvertaking_1 = front_noOvertaking(1);
+
+Connector_0_1 = Connector(0, 1, 1, 1, true, 5);
+
+Connector_1_0 = Connector(1, 0, 1, 1, true, 5);
+
+system Connector_0_1, Connector_1_0, front_1, front_noAcceleration_1, front_noOvertaking_1, rear_0, rear_noOvertaking_0, rear_overtaking_0, UrgencyProvider;
+</system>
+</nta>

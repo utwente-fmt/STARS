@@ -1,0 +1,109 @@
+operation In!Block toLines() : List {
+	var result = new List;
+	result.add("{");
+	if (self.declarations.isDefined()) {
+		result.addAll(self.declarations.toLines(1));
+	}
+	for (stat in self.statement) {
+		result.addAll(stat.toLines(1));
+	}
+	result.add("}");
+	return result;
+}
+
+operation In!DoWhileLoop toLines() : List {
+	var result = new List;
+	var bodyIsBlock = self.statement.isKindOf(In!Block);
+	if (bodyIsBlock) {
+		result = self.statement.toLines().prepend("do ");
+	} else {
+		result.add("do");
+		result.addAll(self.statement.toLines(1));
+	}
+	var lastLine = "while (" + self.expression.toText() + ")";
+	if (bodyIsBlock) {
+		result.append(" " + lastLine);
+	} else {
+		result.add(lastLine);
+	}
+	return result;
+}
+
+operation In!EmptyStatement toLines() : List {
+	return Sequence { ";" };
+}
+
+operation In!ExpressionStatement toLines() : List {
+	return Sequence { self.expression.toText() + ";" };
+}
+
+operation In!ForLoop toLines() : List {
+	var result = new List;
+	var firstLine = "for ("
+		 + self.initialization.toText() + "; "
+		 + self.condition.toText() + "; "
+		 + self.iteration.toText() + ")";
+	if (self.statement.isKindOf(In!Block)) {
+		result = self.statement.toLines();
+		result.prepend(firstLine + " ");
+	} else {
+		result.add(firstLine);
+		result.addAll(self.statement.toLines(1));
+	}
+	return result;
+}
+
+operation In!IfStatement toLines() : List {
+	var result = new List;
+	var firstLine = "if (" + self.ifExpression.toText() + ")";
+	if (self.thenStatement.isKindOf(In!Block)) {
+		result = self.thenStatement.toLines();
+		result.prepend(firstLine + " ");
+	} else {
+		result.add(firstLine);
+		result.addAll(self.thenStatement.toLines(1));
+	}
+	if (self.elseStatement.isDefined()) {
+		var elseBlock = new List;
+		if (self.elseStatement.isKindOf(In!Block)) {
+			elseBlock = self.elseStatement.toLines();
+			elseBlock.prepend("else ");
+		} else {
+			elseBlock.add("else");
+			elseBlock.addAll(self.elseStatement.toLines(1));
+		}
+		result.addAll(elseBlock);
+	}
+	return result;
+}
+
+operation In!Iteration toLines() : List {
+	var result = new List;
+	var firstLine = "for (" + self.toText() + ")";
+	if (self.statement.isKindOf(In!Block)) {
+		result = self.statement.toLines();
+		result.prepend(firstline + " ");
+	} else {
+		result.add(firstLine);
+		result.addAll(self.statement.toLines(1));
+	}
+	return result;
+}
+
+operation In!ReturnStatement toLines() : List {
+	return Sequence { "return " + self.returnExpression.toText() + ";" };
+}
+
+operation In!WhileLoop toLines() : List {
+	var result = new List;
+	var firstLine = "while (" + self.expression.toText() + ")";
+	if (self.statement.isKindOf(In!Block)) {
+		result = self.statement.toLines();
+		result.prepend(firstline + " ");
+	} else {
+		result.add(firstLine);
+		result.addAll(self.statement.toLines(1));
+	}
+	return result;
+}
+
